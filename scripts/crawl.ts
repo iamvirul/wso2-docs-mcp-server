@@ -42,7 +42,7 @@ async function main(): Promise<void> {
 
     const parser = new DocParser();
     const chunker = new DocChunker();
-    const provider = EmbedderFactory.create();
+    const provider = await EmbedderFactory.createAndInit();
 
     const targets = opts.product
         ? [PRODUCTS[opts.product]]

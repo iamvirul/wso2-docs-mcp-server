@@ -10,7 +10,7 @@ export async function startMcpServer(): Promise<void> {
     const vectorStore = new PgVectorStore();
     await vectorStore.initialize();
 
-    const embeddingProvider = EmbedderFactory.create();
+    const embeddingProvider = await EmbedderFactory.createAndInit();
 
     // ── Create MCP server ─────────────────────────────────────────────────────────
     const server = new McpServer({
