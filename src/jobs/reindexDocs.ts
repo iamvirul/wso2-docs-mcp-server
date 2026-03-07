@@ -31,7 +31,9 @@ export class ReindexJob {
     // ── Reindex a single product ──────────────────────────────────────────────────
 
     async reindexProduct(product: ProductConfig, maxPages?: number): Promise<void> {
-        const provider = await EmbedderFactory.createAndInit();
+        // Provider is initialised AFTER the fetch phase to avoid a native-thread
+        // mutex conflict between ONNX Runtime and concurrent HTTP+gzip connections.
+        let provider: Awaited<ReturnType<typeof EmbedderFactory.createAndInit>> | null = null;
         const crawler = new DocCrawler(product, maxPages);
 
         console.log(`\n🔄  Reindexing ${product.name}…`);
@@ -69,6 +71,9 @@ export class ReindexJob {
         let updated = 0;
 
         if (pending.length > 0) {
+            if (!provider) {
+                provider = await EmbedderFactory.createAndInit();
+            }
             const allChunks = pending.flatMap((p) => p.chunks);
             const embedded = await embedChunks(allChunks, provider);
 

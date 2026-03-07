@@ -42,7 +42,12 @@ async function main(): Promise<void> {
 
     const parser = new DocParser();
     const chunker = new DocChunker();
-    const provider = await EmbedderFactory.createAndInit();
+    // Provider is intentionally NOT initialised here.
+    // The HuggingFace ONNX backend spawns native threads; initialising it
+    // while 10 concurrent HTTP+gzip fetches are running causes a mutex
+    // conflict in native code (SIGABRT). We defer init to Phase 2, after
+    // all network I/O is complete.
+    let provider: Awaited<ReturnType<typeof EmbedderFactory.createAndInit>> | null = null;
 
     const targets = opts.product
         ? [PRODUCTS[opts.product]]
@@ -89,11 +94,14 @@ async function main(): Promise<void> {
         });
 
         // ── Phase 2: Batch-embed all pending chunks in one pass ───────────────────
-        // One large provider.embed() call → better hardware utilisation (q8 NEON /
-        // CUDA) and fewer round-trips to Ollama when using the local server.
+        // Initialise the provider HERE — after all HTTP connections are closed —
+        // so ONNX Runtime native threads never overlap with fetch/gzip threads.
         let productChunks = 0;
 
         if (pending.length > 0) {
+            if (!provider) {
+                provider = await EmbedderFactory.createAndInit();
+            }
             const allChunks = pending.flatMap((p) => p.chunks);
             const embedded = await embedChunks(allChunks, provider);
 
