@@ -7,7 +7,9 @@
         "wso2-docs-mcp-server": "./dist/src/index.js"
     },
     "files": [
-        "dist"
+        "dist",
+        ".env.example",
+        "config-examples"
     ],
     "repository": {
         "type": "git",
@@ -26,7 +28,8 @@
     "license": "MIT",
     "scripts": {
         "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsc --project tsconfig.json",
-        "start": "node dist/index.js",
+        "prepare": "npm run build",
+        "start": "node dist/src/index.js",
         "dev": "tsx src/index.ts",
         "crawl": "tsx scripts/crawl.ts",
         "reindex": "tsx src/jobs/reindexDocs.ts",
