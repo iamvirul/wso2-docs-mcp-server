@@ -2,22 +2,13 @@
 # ──────────────────────────────────────────────────────────
 # Claude Code — Add WSO2 Docs MCP Server (stdio transport)
 # ──────────────────────────────────────────────────────────
-# Run this once from the project root after `npm install`
-
-PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# Run this once after completing the setup steps in README.md
 
 claude mcp add wso2-docs \
   --transport stdio \
   -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
   -e EMBEDDING_PROVIDER="ollama" \
-  -- node "$PROJECT_DIR/dist/src/index.js"
+  -- npx -y wso2-docs-mcp-server
 
-# Or use tsx for development (no build step required):
-# claude mcp add wso2-docs \
-#   --transport stdio \
-#   -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-#   -e EMBEDDING_PROVIDER="ollama" \
-#   -- npx tsx "$PROJECT_DIR/src/index.ts"
-
-echo "✅  WSO2 Docs MCP server added to Claude Code"
+echo "WSO2 Docs MCP server added to Claude Code"
 echo "   Verify with: claude mcp list"

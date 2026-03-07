@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
  * Dynamic schema migration — respects EMBEDDING_DIMENSIONS from .env
  * Run: npm run db:migrate

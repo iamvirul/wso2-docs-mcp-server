@@ -4,11 +4,14 @@
     "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
     "main": "dist/src/index.js",
     "bin": {
-        "wso2-docs-mcp-server": "./dist/src/index.js"
+        "wso2-docs-mcp-server": "./dist/src/index.js",
+        "wso2-docs-crawl": "./dist/scripts/crawl.js",
+        "wso2-docs-migrate": "./dist/scripts/migrate.js"
     },
     "files": [
         "dist",
         ".env.example",
+        "docker-compose.yml",
         "config-examples",
         "LICENSE",
         "CHANGELOG.md"
