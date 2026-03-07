@@ -2,9 +2,30 @@
     "name": "wso2-docs-mcp-server",
     "version": "1.0.0",
     "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
-    "main": "dist/index.js",
+    "main": "dist/src/index.js",
+    "bin": {
+        "wso2-docs-mcp-server": "./dist/src/index.js"
+    },
+    "files": [
+        "dist"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/iamvirul/wso2-docs-mcp-server"
+    },
+    "keywords": [
+        "mcp",
+        "modelcontextprotocol",
+        "wso2",
+        "rag",
+        "vector",
+        "docs",
+        "ai"
+    ],
+    "author": "iamvirul",
+    "license": "MIT",
     "scripts": {
-        "build": "tsc --project tsconfig.json",
+        "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsc --project tsconfig.json",
         "start": "node dist/index.js",
         "dev": "tsx src/index.ts",
         "crawl": "tsx scripts/crawl.ts",
