@@ -1,37 +1,44 @@
 {
-  "name": "wso2-docs-mcp-server",
-  "version": "1.0.0",
-  "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
-    "crawl": "tsx scripts/crawl.ts",
-    "reindex": "tsx src/jobs/reindexDocs.ts",
-    "db:migrate": "tsx scripts/migrate.ts"
-  },
-  "dependencies": {
-    "@google/generative-ai": "^0.21.0",
-    "@modelcontextprotocol/sdk": "^1.5.0",
-    "axios": "^1.6.8",
-    "cheerio": "^1.0.0",
-    "commander": "^12.1.0",
-    "dotenv": "^16.4.5",
-    "node-cron": "^3.0.3",
-    "openai": "^4.52.0",
-    "p-limit": "3.1.0",
-    "pg": "^8.11.3",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.0",
-    "@types/node-cron": "^3.0.11",
-    "@types/pg": "^8.11.6",
-    "tsx": "^4.15.0",
-    "typescript": "^5.5.0"
-  },
-  "engines": {
-    "node": ">=20.0.0"
-  }
+    "name": "wso2-docs-mcp-server",
+    "version": "1.0.0",
+    "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "start": "node dist/index.js",
+        "dev": "tsx src/index.ts",
+        "crawl": "tsx scripts/crawl.ts",
+        "reindex": "tsx src/jobs/reindexDocs.ts",
+        "db:migrate": "tsx scripts/migrate.ts",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "test:ci": "vitest run --coverage --reporter=verbose"
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.21.0",
+        "@modelcontextprotocol/sdk": "^1.5.0",
+        "axios": "^1.6.8",
+        "cheerio": "^1.0.0",
+        "commander": "^12.1.0",
+        "dotenv": "^16.4.5",
+        "node-cron": "^3.0.3",
+        "openai": "^4.52.0",
+        "p-limit": "3.1.0",
+        "pg": "^8.11.3",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "@types/node": "^20.14.0",
+        "@types/node-cron": "^3.0.11",
+        "@types/pg": "^8.11.6",
+        "@vitest/coverage-v8": "^4.0.18",
+        "tsx": "^4.15.0",
+        "typescript": "^5.5.0",
+        "vitest": "^4.0.18"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
 }
