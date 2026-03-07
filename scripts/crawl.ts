@@ -55,10 +55,17 @@ async function main(): Promise<void> {
         console.log(`\n📚  Crawling ${product.name} (${product.baseUrl})`);
         const crawler = new DocCrawler(product, opts.limit);
         const productStart = Date.now();
-        let productChunks = 0;
+
+        // ── Phase 1: Fetch + parse + chunk (concurrent, no I/O blocking per slot) ──
+        // pLimit slots are freed as soon as parse+chunk finishes (~5 ms/page),
+        // maximising network parallelism. Embedding is deliberately deferred.
+        interface PendingPage {
+            page: { url: string; contentHash: string };
+            chunks: ReturnType<typeof chunker.chunk>;
+        }
+        const pending: PendingPage[] = [];
 
         const { total, errors } = await crawler.crawl(async (page) => {
-            // ── Skip unchanged pages unless --force ──────────────────────────────────
             if (!opts.force) {
                 const existing = await vectorStore.getPageHash(page.url);
                 if (existing === page.contentHash) {
@@ -67,11 +74,9 @@ async function main(): Promise<void> {
                 }
             }
 
-            // ── Parse ─────────────────────────────────────────────────────────────────
             const parsed = parser.parse(page.html, page.url);
             if (parsed.sections.length === 0) return;
 
-            // ── Chunk ─────────────────────────────────────────────────────────────────
             const chunks = chunker.chunk(parsed, {
                 product: product.id,
                 source_url: page.url,
@@ -80,25 +85,39 @@ async function main(): Promise<void> {
             });
             if (chunks.length === 0) return;
 
-            // ── Embed ─────────────────────────────────────────────────────────────────
-            const embedded = await embedChunks(chunks, provider);
-
-            // ── Upsert ───────────────────────────────────────────────────────────────
-            await vectorStore.deleteBySourceUrl(page.url);
-            await vectorStore.upsertChunks(
-                embedded.map(({ chunk, embedding }) => ({
-                    ...chunk,
-                    content_hash: createHash('sha256').update(chunk.content).digest('hex'),
-                    embedding,
-                }))
-            );
-
-            await vectorStore.setPageHash(page.url, page.contentHash, chunks.length);
-
-            productChunks += chunks.length;
-            totalChunks += chunks.length;
-            process.stdout.write(`\n  ✓ [${chunks.length}] ${page.url.slice(-80)}`);
+            pending.push({ page, chunks });
         });
+
+        // ── Phase 2: Batch-embed all pending chunks in one pass ───────────────────
+        // One large provider.embed() call → better hardware utilisation (q8 NEON /
+        // CUDA) and fewer round-trips to Ollama when using the local server.
+        let productChunks = 0;
+
+        if (pending.length > 0) {
+            const allChunks = pending.flatMap((p) => p.chunks);
+            const embedded = await embedChunks(allChunks, provider);
+
+            // ── Phase 3: Write to DB (one page at a time, preserving atomicity) ──────
+            let offset = 0;
+            for (const { page, chunks } of pending) {
+                const pageEmbedded = embedded.slice(offset, offset + chunks.length);
+                offset += chunks.length;
+
+                await vectorStore.deleteBySourceUrl(page.url);
+                await vectorStore.upsertChunks(
+                    pageEmbedded.map(({ chunk, embedding }) => ({
+                        ...chunk,
+                        content_hash: createHash('sha256').update(chunk.content).digest('hex'),
+                        embedding,
+                    }))
+                );
+                await vectorStore.setPageHash(page.url, page.contentHash, chunks.length);
+
+                productChunks += chunks.length;
+                totalChunks += chunks.length;
+                process.stdout.write(`\n  ✓ [${chunks.length}] ${page.url.slice(-80)}`);
+            }
+        }
 
         const elapsed = ((Date.now() - productStart) / 1000).toFixed(1);
         console.log(

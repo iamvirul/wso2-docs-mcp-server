@@ -22,10 +22,15 @@ export class DocCrawler {
     private client = axios.create({
         timeout: CRAWLER_DEFAULTS.timeout,
         headers: {
-            'User-Agent': 'WSO2-Docs-MCP-Crawler/1.0 (+https://github.com/wso2-docs-mcp)',
+            'User-Agent': 'WSO2-Docs-MCP-Crawler/1.0 (+https://github.com/iamvirul/wso2-docs-mcp-server)',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
         },
+        // Decompress gzip/br automatically
+        decompress: true,
+        maxContentLength: 10 * 1024 * 1024, // 10 MB cap per page
     });
 
     constructor(private product: ProductConfig, private maxPages?: number) { }

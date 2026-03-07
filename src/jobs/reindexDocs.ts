@@ -35,54 +35,63 @@ export class ReindexJob {
         const crawler = new DocCrawler(product, maxPages);
 
         console.log(`\n🔄  Reindexing ${product.name}…`);
-        let updated = 0;
         let skipped = 0;
 
+        // ── Phase 1: Fetch + parse + chunk (concurrent, no embed in hot path) ────
+        interface PendingPage {
+            page: { url: string; contentHash: string };
+            chunks: ReturnType<DocChunker['chunk']>;
+        }
+        const pending: PendingPage[] = [];
+
         const { total, errors } = await crawler.crawl(async (page) => {
-            // ── Hash-based change detection ──────────────────────────────────────────
             const existingHash = await this.vectorStore.getPageHash(page.url);
             if (existingHash === page.contentHash) {
                 skipped++;
                 return;
             }
 
-            // ── Parse ─────────────────────────────────────────────────────────────────
             const parsed = this.parser.parse(page.html, page.url);
             if (parsed.sections.length === 0) return;
 
-            // ── Chunk ─────────────────────────────────────────────────────────────────
             const chunks = this.chunker.chunk(parsed, {
                 product: product.id,
                 source_url: page.url,
                 title: parsed.title,
                 version: product.version,
             });
-
             if (chunks.length === 0) return;
 
-            // ── Embed ─────────────────────────────────────────────────────────────────
-            const embedded = await embedChunks(chunks, provider);
-
-            // ── Delete stale chunks and upsert new ───────────────────────────────────
-            await this.vectorStore.deleteBySourceUrl(page.url);
-            await this.vectorStore.upsertChunks(
-                embedded.map(({ chunk, embedding }) => ({
-                    ...chunk,
-                    content_hash: createHash('sha256')
-                        .update(chunk.content)
-                        .digest('hex'),
-                    embedding,
-                }))
-            );
-
-            // ── Update crawl state ───────────────────────────────────────────────────
-            await this.vectorStore.setPageHash(page.url, page.contentHash, chunks.length);
-            updated++;
-
-            process.stdout.write(
-                `  ✓ ${page.url.slice(-70)} (${chunks.length} chunks)\n`
-            );
+            pending.push({ page, chunks });
         });
+
+        // ── Phase 2: Batch-embed all pending chunks in one pass ──────────────────
+        let updated = 0;
+
+        if (pending.length > 0) {
+            const allChunks = pending.flatMap((p) => p.chunks);
+            const embedded = await embedChunks(allChunks, provider);
+
+            // ── Phase 3: Write to DB ─────────────────────────────────────────────────
+            let offset = 0;
+            for (const { page, chunks } of pending) {
+                const pageEmbedded = embedded.slice(offset, offset + chunks.length);
+                offset += chunks.length;
+
+                await this.vectorStore.deleteBySourceUrl(page.url);
+                await this.vectorStore.upsertChunks(
+                    pageEmbedded.map(({ chunk, embedding }) => ({
+                        ...chunk,
+                        content_hash: createHash('sha256').update(chunk.content).digest('hex'),
+                        embedding,
+                    }))
+                );
+                await this.vectorStore.setPageHash(page.url, page.contentHash, chunks.length);
+                updated++;
+
+                process.stdout.write(`  ✓ ${page.url.slice(-70)} (${chunks.length} chunks)\n`);
+            }
+        }
 
         console.log(
             `\n  ${product.name}: ${updated} updated, ${skipped} unchanged, ${errors} errors (${total} fetched)`

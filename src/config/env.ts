@@ -27,7 +27,7 @@ const schema = z.object({
     MCP_SERVER_NAME: z.string().default('wso2-docs-mcp'),
     MCP_SERVER_VERSION: z.string().default('1.0.0'),
 
-    CRAWL_CONCURRENCY: z.coerce.number().int().positive().default(5),
+    CRAWL_CONCURRENCY: z.coerce.number().int().positive().default(10),
     CHUNK_SIZE: z.coerce.number().int().positive().default(800),
     CHUNK_OVERLAP: z.coerce.number().int().nonnegative().default(100),
     CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
