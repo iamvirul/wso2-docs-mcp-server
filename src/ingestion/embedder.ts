@@ -41,6 +41,7 @@ class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
     // Typed as unknown to avoid importing the heavy type at module load time;
     // the actual pipeline is loaded lazily via dynamic import.
     private extractor: unknown = null;
+    private batchSize = 16; // overwritten by initialize() based on detected accelerator
     readonly dimensions: number;
     readonly modelName: string;
 
@@ -59,22 +60,24 @@ class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
         if (this.extractor !== null) return;
 
         const accelerator = detectAccelerator();
+        this.batchSize = accelerator.batchSize;
+
         process.stderr.write(
-            `  Loading HuggingFace model "${this.modelName}" via ONNX on ${accelerator.label} (downloads on first run)…\n`
+            `  Loading HuggingFace model "${this.modelName}" [${accelerator.dtype}] on ${accelerator.label}…\n`
         );
 
         // Dynamic import keeps the heavy @huggingface/transformers out of the
         // module graph until it is actually needed.
         const { pipeline } = await import('@huggingface/transformers');
         this.extractor = await pipeline('feature-extraction', this.modelName, {
-            dtype: 'fp32',
+            dtype: accelerator.dtype,
             session_options: {
                 executionProviders: accelerator.executionProviders,
             },
         });
 
         process.stderr.write(
-            `  HuggingFace model "${this.modelName}" ready (${accelerator.label}).\n`
+            `  HuggingFace model ready — backend: ${accelerator.label}, batch: ${accelerator.batchSize}.\n`
         );
     }
 
@@ -83,15 +86,14 @@ class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
             throw new Error('HuggingFaceLocalEmbeddingProvider not initialized — call initialize() first.');
         }
 
-        const BATCH = 16; // conservative for in-process ONNX inference
         const results: number[][] = [];
         const extractor = this.extractor as (
             input: string[],
             options: { pooling: string; normalize: boolean }
         ) => Promise<{ tolist(): number[][] }>;
 
-        for (let i = 0; i < texts.length; i += BATCH) {
-            const batch = texts.slice(i, i + BATCH);
+        for (let i = 0; i < texts.length; i += this.batchSize) {
+            const batch = texts.slice(i, i + this.batchSize);
             const output = await extractor(batch, { pooling: 'mean', normalize: true });
             results.push(...output.tolist());
         }
