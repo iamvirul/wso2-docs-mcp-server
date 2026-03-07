@@ -4,6 +4,7 @@ import axios from 'axios';
 import type { Readable } from 'stream';
 import { env } from '../config/env';
 import { DocChunk } from './chunker';
+import { detectAccelerator } from './accelerator';
 
 // ── Ollama API types ──────────────────────────────────────────────────────────
 
@@ -50,13 +51,16 @@ class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
 
     /**
      * Downloads (once) and loads the ONNX model into memory.
+     * Automatically selects the best available compute backend:
+     *   Apple Silicon → CoreML (Metal), NVIDIA → CUDA, otherwise → CPU.
      * Subsequent calls are no-ops once the extractor is initialized.
      */
     async initialize(): Promise<void> {
         if (this.extractor !== null) return;
 
+        const accelerator = detectAccelerator();
         process.stderr.write(
-            `  Loading HuggingFace model "${this.modelName}" via ONNX (downloads on first run)…\n`
+            `  Loading HuggingFace model "${this.modelName}" via ONNX on ${accelerator.label} (downloads on first run)…\n`
         );
 
         // Dynamic import keeps the heavy @huggingface/transformers out of the
@@ -64,9 +68,14 @@ class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
         const { pipeline } = await import('@huggingface/transformers');
         this.extractor = await pipeline('feature-extraction', this.modelName, {
             dtype: 'fp32',
+            session_options: {
+                executionProviders: accelerator.executionProviders,
+            },
         });
 
-        process.stderr.write(`  HuggingFace model "${this.modelName}" ready.\n`);
+        process.stderr.write(
+            `  HuggingFace model "${this.modelName}" ready (${accelerator.label}).\n`
+        );
     }
 
     async embed(texts: string[]): Promise<number[][]> {
