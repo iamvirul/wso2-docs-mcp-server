@@ -17,10 +17,10 @@ A production-ready **Model Context Protocol (MCP)** server that provides AI assi
 
 - **Node.js** ≥ 20
 - **Docker** (for pgvector)
-- API key for your chosen embedding provider:
-  - OpenAI (`sk-…`)
-  - Google Gemini (`AIza…`)
-  - Voyage AI (`pa-…`)
+- **Embeddings** — no API key required by default:
+  - **[Ollama](https://ollama.com)** (recommended) — runs locally, model auto-downloaded on first run
+  - If Ollama is not running, the server automatically falls back to **HuggingFace ONNX** (in-process, also downloads automatically)
+  - Cloud providers are also supported: OpenAI, Google Gemini, Voyage AI
 
 ---
 
@@ -33,32 +33,44 @@ cd "WSO2 Docs MCP Server"
 npm install
 ```
 
-### 2. Configure environment
+### 2. Start Ollama (optional but recommended)
+
+[Install Ollama](https://ollama.com) and start it:
+
+```bash
+ollama serve
+```
+
+> **No Ollama?** Skip this step. The server detects Ollama is not running and automatically falls back to HuggingFace ONNX inference — the model downloads on first use with no extra setup.
+
+### 3. Configure environment
 
 ```bash
 cp .env.example .env
-# Edit .env: set DATABASE_URL, EMBEDDING_PROVIDER, and the matching API key
+# Defaults work out of the box with Ollama.
+# Only edit if using a cloud provider (OpenAI / Gemini / Voyage).
 ```
 
-### 3. Start pgvector
+### 4. Start pgvector
 
 ```bash
 docker compose up -d
 # pgAdmin available at http://localhost:5050 (admin@wso2mcp.local / admin)
 ```
 
-### 4. Run database migration
+### 5. Run database migration
 
 ```bash
 npm run db:migrate
 ```
 
-> **Note:** Run migration again whenever you change `EMBEDDING_DIMENSIONS` (i.e. switch provider). The script detects and handles dimension changes automatically.
+> **Note:** Run migration again whenever you change `EMBEDDING_DIMENSIONS` (i.e. switch embedding provider). The script detects and handles dimension changes automatically.
 
-### 5. Index documentation
+### 6. Index documentation
 
 ```bash
-# Index all products (takes 15–60 min depending on provider rate limits)
+# Index all products
+# On first run the embedding model is downloaded automatically (Ollama or HuggingFace)
 npm run crawl
 
 # Index a single product (faster, great for testing)
@@ -68,7 +80,7 @@ npm run crawl -- --product ballerina --limit 20
 npm run crawl -- --force
 ```
 
-### 6. Build and start the MCP server
+### 7. Build and start the MCP server
 
 ```bash
 npm run build
@@ -98,13 +110,15 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "args": ["/ABSOLUTE/PATH/TO/WSO2 Docs MCP Server/dist/index.js"],
       "env": {
         "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
-        "EMBEDDING_PROVIDER": "openai",
-        "OPENAI_API_KEY": "sk-..."
+        "EMBEDDING_PROVIDER": "ollama"
       }
     }
   }
 }
 ```
+
+> Using a cloud provider instead? Add the appropriate key, e.g. `"EMBEDDING_PROVIDER": "openai", "OPENAI_API_KEY": "sk-..."`.
+
 
 ### Claude Code
 
@@ -155,29 +169,64 @@ Create `.vscode/mcp.json` — see `config-examples/vscode_mcp.json`.
 
 ---
 
+## Local Embeddings
+
+The default `EMBEDDING_PROVIDER=ollama` runs entirely on your machine with no API key. The startup sequence is:
+
+```
+Is Ollama running?
+├── Yes → Is model present?
+│         ├── Yes → Ready (instant)
+│         └── No  → Pull via Ollama (streamed, runs once)
+└── No  → Download ONNX model from HuggingFace Hub (~250 MB, cached after first run)
+           and run inference in-process via @huggingface/transformers
+```
+
+Both paths use `nomic-embed-text` / `Xenova/nomic-embed-text-v1` by default and produce identical 768-dim vectors, so you can switch between them without re-indexing.
+
+---
+
 ## Environment Variables
+
+### Core
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | — | PostgreSQL connection string |
-| `EMBEDDING_PROVIDER` | `openai` | `openai` \| `gemini` \| `voyage` |
-| `OPENAI_API_KEY` | — | Required if provider = openai |
-| `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI model name |
-| `GEMINI_API_KEY` | — | Required if provider = gemini |
-| `GEMINI_EMBEDDING_MODEL` | `text-embedding-004` | Gemini model (768 dims) |
-| `VOYAGE_API_KEY` | — | Required if provider = voyage |
-| `VOYAGE_EMBEDDING_MODEL` | `voyage-3` | Voyage model (1024 dims) |
-| `EMBEDDING_DIMENSIONS` | `1536` | Must match model output dimensions |
+| `DATABASE_URL` | — | PostgreSQL connection string (required) |
+| `EMBEDDING_PROVIDER` | `ollama` | `ollama` \| `openai` \| `gemini` \| `voyage` |
+| `EMBEDDING_DIMENSIONS` | `768` | Must match model output dimensions |
 | `CRAWL_CONCURRENCY` | `5` | Concurrent HTTP requests during crawl |
 | `CHUNK_SIZE` | `800` | Approximate tokens per chunk |
 | `CHUNK_OVERLAP` | `100` | Overlap tokens between chunks |
 | `CACHE_TTL_SECONDS` | `3600` | In-memory query cache TTL |
 | `TOP_K_RESULTS` | `10` | Default search result count |
 
+### Ollama (default)
+
+| Variable | Default | Description |
+|---|---|---|
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
+| `OLLAMA_EMBEDDING_MODEL` | `nomic-embed-text` | Model pulled and used via Ollama |
+| `HUGGINGFACE_EMBEDDING_MODEL` | `Xenova/nomic-embed-text-v1` | ONNX fallback when Ollama is not running |
+
+### Cloud providers
+
+| Variable | Default | Description |
+|---|---|---|
+| `OPENAI_API_KEY` | — | Required if `EMBEDDING_PROVIDER=openai` |
+| `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI model |
+| `GEMINI_API_KEY` | — | Required if `EMBEDDING_PROVIDER=gemini` |
+| `GEMINI_EMBEDDING_MODEL` | `text-embedding-004` | Gemini model |
+| `VOYAGE_API_KEY` | — | Required if `EMBEDDING_PROVIDER=voyage` |
+| `VOYAGE_EMBEDDING_MODEL` | `voyage-3` | Voyage model |
+
 ### Embedding dimension reference
 
 | Provider | Model | Dimensions |
 |---|---|---|
+| Ollama / HuggingFace | `nomic-embed-text` / `Xenova/nomic-embed-text-v1` | **768** (default) |
+| Ollama / HuggingFace | `mxbai-embed-large` / `Xenova/mxbai-embed-large-v1` | 1024 |
+| Ollama / HuggingFace | `all-minilm` / `Xenova/all-MiniLM-L6-v2` | 384 |
 | OpenAI | `text-embedding-3-small` | 1536 |
 | OpenAI | `text-embedding-3-large` | 3072 |
 | Gemini | `text-embedding-004` | 768 |
