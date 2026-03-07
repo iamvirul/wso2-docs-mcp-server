@@ -6,7 +6,12 @@ dotenv.config();
 const schema = z.object({
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 
-    EMBEDDING_PROVIDER: z.enum(['openai', 'gemini', 'voyage']).default('openai'),
+    EMBEDDING_PROVIDER: z.enum(['ollama', 'openai', 'gemini', 'voyage']).default('ollama'),
+
+    OLLAMA_BASE_URL: z.string().url().default('http://localhost:11434'),
+    OLLAMA_EMBEDDING_MODEL: z.string().default('nomic-embed-text'),
+    // HuggingFace model used when Ollama is not running (ONNX, runs in-process)
+    HUGGINGFACE_EMBEDDING_MODEL: z.string().default('Xenova/nomic-embed-text-v1'),
 
     OPENAI_API_KEY: z.string().optional(),
     OPENAI_EMBEDDING_MODEL: z.string().default('text-embedding-3-small'),
@@ -17,7 +22,7 @@ const schema = z.object({
     VOYAGE_API_KEY: z.string().optional(),
     VOYAGE_EMBEDDING_MODEL: z.string().default('voyage-3'),
 
-    EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(1536),
+    EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(768),
 
     MCP_SERVER_NAME: z.string().default('wso2-docs-mcp'),
     MCP_SERVER_VERSION: z.string().default('1.0.0'),

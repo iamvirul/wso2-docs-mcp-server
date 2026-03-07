@@ -31,7 +31,7 @@ export class ReindexJob {
     // ── Reindex a single product ──────────────────────────────────────────────────
 
     async reindexProduct(product: ProductConfig, maxPages?: number): Promise<void> {
-        const provider = EmbedderFactory.create();
+        const provider = await EmbedderFactory.createAndInit();
         const crawler = new DocCrawler(product, maxPages);
 
         console.log(`\n🔄  Reindexing ${product.name}…`);

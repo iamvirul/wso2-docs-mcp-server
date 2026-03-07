@@ -39,6 +39,7 @@
     },
     "dependencies": {
         "@google/generative-ai": "^0.21.0",
+        "@huggingface/transformers": "^3.8.1",
         "@modelcontextprotocol/sdk": "^1.5.0",
         "axios": "^1.6.8",
         "cheerio": "^1.0.0",
