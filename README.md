@@ -199,9 +199,15 @@ CoreML compiles Metal shaders on first use (~20 min cold-start). For the typical
 
 **Benchmark (Apple M-chip, `Xenova/nomic-embed-text-v1`):**
 ```
-fp32 CPU (before): ~1,000 ms/chunk
-q8  ARM NEON:          ~9 ms/chunk   ← ~100× speedup
+fp32 CPU (before): ~1,000 ms/chunk   (68 chunks ≈ 68 s of embedding)
+q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~100× speedup
 ```
+
+> **Note:** For small crawls (≤ 10 pages) total wall-clock time is dominated by network I/O
+> (HTTPS fetches to docs sites), so the end-to-end improvement is modest. The embedding
+> speedup becomes significant at scale — crawling 500+ pages where embedding previously
+> accounted for hours of runtime. For best crawl performance, run Ollama (`ollama serve`)
+> which parallelises inference natively and has no per-chunk overhead.
 
 ---
 
