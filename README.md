@@ -26,14 +26,143 @@ A production-ready **Model Context Protocol (MCP)** server that provides AI assi
 
 ## Quick Start
 
-### 1. Clone and install
+Choose the setup path that fits your use case:
+
+- **[Install from npm](#install-from-npm)** — simplest, no cloning required
+- **[Clone and build](#clone-and-build)** — for development or contributions
+
+---
+
+### Install from npm
+
+#### 1. Start pgvector
+
+Download the `docker-compose.yml` from the repository and start the database:
 
 ```bash
-cd "WSO2 Docs MCP Server"
+curl -O https://raw.githubusercontent.com/iamvirul/wso2-docs-mcp-server/main/docker-compose.yml
+docker compose up -d
+```
+
+#### 2. Start Ollama (optional but recommended)
+
+[Install Ollama](https://ollama.com) and start it:
+
+```bash
+ollama serve
+```
+
+> **No Ollama?** Skip this step. The server automatically falls back to HuggingFace ONNX — model downloads on first use with no extra setup.
+
+#### 3. Run database migration
+
+```bash
+DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  npx wso2-docs-migrate
+```
+
+> Run migration again whenever you change `EMBEDDING_DIMENSIONS` (i.e. switch embedding provider). The script detects and handles dimension changes automatically.
+
+#### 4. Index WSO2 documentation
+
+```bash
+# Index all products (first run downloads the embedding model automatically)
+DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  npx wso2-docs-crawl
+
+# Index a single product (faster, great for testing)
+DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  npx wso2-docs-crawl --product ballerina --limit 20
+
+# Force re-index even unchanged pages
+DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  npx wso2-docs-crawl --force
+```
+
+#### 5. Configure your AI client
+
+Pick your client below — all use `npx` so no global install is needed.
+
+**Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "wso2-docs": {
+      "command": "npx",
+      "args": ["-y", "wso2-docs-mcp-server"],
+      "env": {
+        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "EMBEDDING_PROVIDER": "ollama"
+      }
+    }
+  }
+}
+```
+
+**Claude Code:**
+
+```bash
+claude mcp add wso2-docs \
+  --transport stdio \
+  -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  -e EMBEDDING_PROVIDER="ollama" \
+  -- npx -y wso2-docs-mcp-server
+
+# Verify
+claude mcp list
+```
+
+**Cursor** — create `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "wso2-docs": {
+      "command": "npx",
+      "args": ["-y", "wso2-docs-mcp-server"],
+      "env": {
+        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "EMBEDDING_PROVIDER": "ollama"
+      }
+    }
+  }
+}
+```
+
+**VS Code** — create `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "wso2-docs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "wso2-docs-mcp-server"],
+      "env": {
+        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "EMBEDDING_PROVIDER": "ollama"
+      }
+    }
+  }
+}
+```
+
+> Using a cloud provider? Add the key to `env`, e.g. `"EMBEDDING_PROVIDER": "openai", "OPENAI_API_KEY": "sk-..."`.
+
+---
+
+### Clone and build
+
+#### 1. Clone and install
+
+```bash
+git clone https://github.com/iamvirul/wso2-docs-mcp-server.git
+cd wso2-docs-mcp-server
 npm install
 ```
 
-### 2. Start Ollama (optional but recommended)
+#### 2. Start Ollama (optional but recommended)
 
 [Install Ollama](https://ollama.com) and start it:
 
@@ -43,7 +172,7 @@ ollama serve
 
 > **No Ollama?** Skip this step. The server detects Ollama is not running and automatically falls back to HuggingFace ONNX inference — the model downloads on first use with no extra setup.
 
-### 3. Configure environment
+#### 3. Configure environment
 
 ```bash
 cp .env.example .env
@@ -51,14 +180,14 @@ cp .env.example .env
 # Only edit if using a cloud provider (OpenAI / Gemini / Voyage).
 ```
 
-### 4. Start pgvector
+#### 4. Start pgvector
 
 ```bash
 docker compose up -d
 # pgAdmin available at http://localhost:5050 (admin@wso2mcp.local / admin)
 ```
 
-### 5. Run database migration
+#### 5. Run database migration
 
 ```bash
 npm run db:migrate
@@ -66,7 +195,7 @@ npm run db:migrate
 
 > **Note:** Run migration again whenever you change `EMBEDDING_DIMENSIONS` (i.e. switch embedding provider). The script detects and handles dimension changes automatically.
 
-### 6. Index documentation
+#### 6. Index documentation
 
 ```bash
 # Index all products
@@ -80,7 +209,7 @@ npm run crawl -- --product ballerina --limit 20
 npm run crawl -- --force
 ```
 
-### 7. Build and start the MCP server
+#### 7. Build and start the MCP server
 
 ```bash
 npm run build
@@ -92,22 +221,18 @@ For development (no build step):
 npm run dev
 ```
 
----
+#### 8. Configure your AI client
 
-## Client Configuration
+> Replace `/ABSOLUTE/PATH/TO/wso2-docs-mcp-server` with your actual clone path.
 
-> Replace `/ABSOLUTE/PATH/TO/WSO2 Docs MCP Server` with your actual project path.
-
-### Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+**Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "wso2-docs": {
       "command": "node",
-      "args": ["/ABSOLUTE/PATH/TO/WSO2 Docs MCP Server/dist/index.js"],
+      "args": ["/ABSOLUTE/PATH/TO/wso2-docs-mcp-server/dist/src/index.js"],
       "env": {
         "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
         "EMBEDDING_PROVIDER": "ollama"
@@ -117,15 +242,14 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-> Using a cloud provider instead? Add the appropriate key, e.g. `"EMBEDDING_PROVIDER": "openai", "OPENAI_API_KEY": "sk-..."`.
-
-
-### Claude Code
+**Claude Code:**
 
 ```bash
-# After npm run build
-claude mcp add wso2-docs --transport stdio -- \
-  node "/ABSOLUTE/PATH/TO/WSO2 Docs MCP Server/dist/index.js"
+claude mcp add wso2-docs \
+  --transport stdio \
+  -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  -e EMBEDDING_PROVIDER="ollama" \
+  -- node "/ABSOLUTE/PATH/TO/wso2-docs-mcp-server/dist/src/index.js"
 
 # Verify
 claude mcp list
@@ -133,13 +257,9 @@ claude mcp list
 
 See `config-examples/claude_code.sh` for a convenience script.
 
-### Cursor
+**Cursor** — create `.cursor/mcp.json` — see `config-examples/cursor_mcp.json`.
 
-Create `.cursor/mcp.json` in your project root — see `config-examples/cursor_mcp.json`.
-
-### VS Code
-
-Create `.vscode/mcp.json` — see `config-examples/vscode_mcp.json`.
+**VS Code** — create `.vscode/mcp.json` — see `config-examples/vscode_mcp.json`.
 
 ---
 

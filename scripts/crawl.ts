@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 import { Command } from 'commander';
 import { createHash } from 'crypto';
 import { PRODUCTS, PRODUCT_IDS } from '../src/config/constants';
