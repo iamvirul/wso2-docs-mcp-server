@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-03-08
+
+### Added
+
+- **Claude Code MCP Integration**: Added `config-examples/claude_code.sh` with ready-to-use scripts for adding the WSO2 Docs MCP server to Claude Code via stdio transport
+- **Claude Desktop MCP Integration**: Added `config-examples/claude_desktop.sh` with scripts for integrating with Claude Desktop
+- **Claude Code Configuration**: Added `CLAUDE_CODE_CONFIG.md` with detailed instructions and best practices for configuring the MCP server in Claude Code
+- **Claude Desktop Configuration**: Added `CLAUDE_DESKTOP_CONFIG.md` with detailed instructions for Claude Desktop integration
+- **GitHub Actions**: Added `CLAUDE_CODE_CONFIG.md` and `CLAUDE_DESKTOP_CONFIG.md` to the repository
+
+### Changed
+
+- **Version**: Updated from 1.0.0 to 1.1.0
+- **Package Files**: Updated `package.json` and `CHANGELOG.md` to reflect the new version
+- **Documentation**: Added comprehensive integration guides for Claude Code and Claude Desktop
+
 ## [1.0.0] - 2026-03-07
 
 ### Added
