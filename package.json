@@ -9,7 +9,9 @@
     "files": [
         "dist",
         ".env.example",
-        "config-examples"
+        "config-examples",
+        "LICENSE",
+        "CHANGELOG.md"
     ],
     "repository": {
         "type": "git",
@@ -25,7 +27,7 @@
         "ai"
     ],
     "author": "iamvirul",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "scripts": {
         "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsc --project tsconfig.json",
         "prepare": "npm run build",
