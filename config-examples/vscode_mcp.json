@@ -1,0 +1,16 @@
+{
+    "servers": {
+        "wso2-docs": {
+            "type": "stdio",
+            "command": "node",
+            "args": [
+                "/ABSOLUTE/PATH/TO/WSO2 Docs MCP Server/dist/index.js"
+            ],
+            "env": {
+                "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+                "EMBEDDING_PROVIDER": "openai",
+                "OPENAI_API_KEY": "sk-..."
+            }
+        }
+    }
+}
