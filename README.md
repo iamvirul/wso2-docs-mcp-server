@@ -2,6 +2,10 @@
 
 A production-ready **Model Context Protocol (MCP)** server that provides AI assistants (Claude Desktop, Claude Code, Cursor, VS Code) with semantic search over WSO2 documentation via Retrieval-Augmented Generation (RAG).
 
+Under the hood, it uses a blazing-fast dual-ingestion engine:
+- **GitHub Native:** Fetches raw Markdown directly from WSO2's public GitHub repositories via the Git Trees API (avoids web-scraping noise and rate limits)
+- **Web Crawl Fallback:** For products without dedicated GitHub docs repos (like the WSO2 Library)
+
 ## Documentation Sources
 
 | Product | URL |
@@ -402,7 +406,7 @@ DATABASE_URL=... node -e "
 src/
   config/          env.ts · constants.ts
   vectorstore/     pgvector.ts · schema.sql
-  ingestion/       crawler.ts · parser.ts · chunker.ts · embedder.ts
+  ingestion/       crawler.ts · parser.ts · githubFetcher.ts · markdownParser.ts · chunker.ts · embedder.ts
   server/          mcpServer.ts · toolRegistry.ts
   jobs/            reindexDocs.ts
   index.ts
