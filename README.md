@@ -1,5 +1,8 @@
 # WSO2 Docs MCP Server
 
+[![npm version](https://img.shields.io/npm/v/wso2-docs-mcp-server.svg)](https://www.npmjs.com/package/wso2-docs-mcp-server)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+
 A production-ready **Model Context Protocol (MCP)** server that provides AI assistants (Claude Desktop, Claude Code, Cursor, VS Code) with semantic search over WSO2 documentation via Retrieval-Augmented Generation (RAG).
 
 Under the hood, it uses a blazing-fast dual-ingestion engine:
@@ -48,6 +51,8 @@ flowchart TD
     
     E -->|"Tokens/Chunks"| F
     F -->|"768-dim Vectors"| G
+```bash
+npm install -g wso2-docs-mcp-server
 ```
 
 ## Documentation Sources
@@ -83,9 +88,17 @@ Choose the setup path that fits your use case:
 
 ### Install from npm
 
+Install the package globally to get the `wso2-docs-mcp-server`, `wso2-docs-crawl`, and `wso2-docs-migrate` commands available system-wide:
+
+```bash
+npm install -g wso2-docs-mcp-server
+```
+
+> **Prefer no global install?** You can use `npx wso2-docs-mcp-server`, `npx wso2-docs-crawl`, and `npx wso2-docs-migrate` in every step below — just replace the bare command with its `npx` equivalent.
+
 #### 1. Start pgvector
 
-Download the `docker-compose.yml` from the repository and start the database:
+Download the `docker-compose.yml` and start the database:
 
 ```bash
 curl -O https://raw.githubusercontent.com/iamvirul/wso2-docs-mcp-server/main/docker-compose.yml
@@ -94,9 +107,10 @@ docker compose up -d
 
 #### 2. Start Ollama (optional but recommended)
 
-[Install Ollama](https://ollama.com) and start it:
+[Install Ollama](https://ollama.com) and pull the default embedding model:
 
 ```bash
+ollama pull nomic-embed-text
 ollama serve
 ```
 
@@ -106,7 +120,7 @@ ollama serve
 
 ```bash
 DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  npx wso2-docs-migrate
+  wso2-docs-migrate
 ```
 
 > Run migration again whenever you change `EMBEDDING_DIMENSIONS` (i.e. switch embedding provider). The script detects and handles dimension changes automatically.
@@ -116,20 +130,22 @@ DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
 ```bash
 # Index all products (first run downloads the embedding model automatically)
 DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  npx wso2-docs-crawl
+  wso2-docs-crawl
 
 # Index a single product (faster, great for testing)
 DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  npx wso2-docs-crawl --product ballerina --limit 20
+  wso2-docs-crawl --product ballerina --limit 20
 
 # Force re-index even unchanged pages
 DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  npx wso2-docs-crawl --force
+  wso2-docs-crawl --force
 ```
+
+Available product IDs: `apim`, `mi`, `choreo`, `ballerina`, `bi`, `library`
 
 #### 5. Configure your AI client
 
-Pick your client below — all use `npx` so no global install is needed.
+The MCP server is launched on demand by your AI client — no background process needed.
 
 **Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -137,8 +153,7 @@ Pick your client below — all use `npx` so no global install is needed.
 {
   "mcpServers": {
     "wso2-docs": {
-      "command": "npx",
-      "args": ["-y", "wso2-docs-mcp-server"],
+      "command": "wso2-docs-mcp-server",
       "env": {
         "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
         "EMBEDDING_PROVIDER": "ollama"
@@ -148,27 +163,26 @@ Pick your client below — all use `npx` so no global install is needed.
 }
 ```
 
-**Claude Code:**
+**Claude Code** — run once in your terminal:
 
 ```bash
 claude mcp add wso2-docs \
   --transport stdio \
   -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
   -e EMBEDDING_PROVIDER="ollama" \
-  -- npx -y wso2-docs-mcp-server
+  -- wso2-docs-mcp-server
 
 # Verify
 claude mcp list
 ```
 
-**Cursor** — create `.cursor/mcp.json`:
+**Cursor** — create `.cursor/mcp.json` in your project root:
 
 ```json
 {
   "mcpServers": {
     "wso2-docs": {
-      "command": "npx",
-      "args": ["-y", "wso2-docs-mcp-server"],
+      "command": "wso2-docs-mcp-server",
       "env": {
         "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
         "EMBEDDING_PROVIDER": "ollama"
@@ -185,8 +199,7 @@ claude mcp list
   "servers": {
     "wso2-docs": {
       "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "wso2-docs-mcp-server"],
+      "command": "wso2-docs-mcp-server",
       "env": {
         "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
         "EMBEDDING_PROVIDER": "ollama"
@@ -196,7 +209,9 @@ claude mcp list
 }
 ```
 
-> Using a cloud provider? Add the key to `env`, e.g. `"EMBEDDING_PROVIDER": "openai", "OPENAI_API_KEY": "sk-..."`.
+> **Using `npx` instead of global install?** Replace `"command": "wso2-docs-mcp-server"` with `"command": "npx"` and add `"args": ["-y", "wso2-docs-mcp-server"]`.
+
+> **Cloud embedding provider?** Add the key to `env`, e.g. `"EMBEDDING_PROVIDER": "openai", "OPENAI_API_KEY": "sk-..."`.
 
 ---
 
