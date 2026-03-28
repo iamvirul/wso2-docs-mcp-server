@@ -2,6 +2,8 @@
 import { Command } from 'commander';
 import { createHash } from 'crypto';
 import { PRODUCTS, PRODUCT_IDS } from '../src/config/constants';
+import { GitHubDocFetcher } from '../src/ingestion/githubFetcher';
+import { MarkdownParser } from '../src/ingestion/markdownParser';
 import { DocCrawler } from '../src/ingestion/crawler';
 import { DocParser } from '../src/ingestion/parser';
 import { DocChunker } from '../src/ingestion/chunker';
@@ -12,17 +14,17 @@ const program = new Command();
 
 program
     .name('crawl')
-    .description('Crawl and index WSO2 documentation into pgvector')
+    .description('Index WSO2 documentation into pgvector (GitHub-native Markdown + web-crawl fallback)')
     .option(
         '-p, --product <id>',
-        `Product to crawl. One of: ${PRODUCT_IDS.join(', ')}. Omit to crawl all.`
+        `Product to index. One of: ${PRODUCT_IDS.join(', ')}. Omit to index all.`
     )
     .option(
         '-l, --limit <n>',
-        'Max pages per product (useful for testing)',
+        'Max pages/files per product (useful for testing)',
         parseInt
     )
-    .option('--force', 'Re-index even pages whose content has not changed', false)
+    .option('--force', 'Re-index even content that has not changed', false)
     .parse(process.argv);
 
 const opts = program.opts<{ product?: string; limit?: number; force: boolean }>();
@@ -40,13 +42,12 @@ async function main(): Promise<void> {
     const vectorStore = new PgVectorStore();
     await vectorStore.initialize();
 
-    const parser = new DocParser();
     const chunker = new DocChunker();
-    // Provider is intentionally NOT initialised here.
-    // The HuggingFace ONNX backend spawns native threads; initialising it
-    // while 10 concurrent HTTP+gzip fetches are running causes a mutex
-    // conflict in native code (SIGABRT). We defer init to Phase 2, after
-    // all network I/O is complete.
+    // HTML parser + Markdown parser are both lightweight; create once
+    const htmlParser = new DocParser();
+    const mdParser = new MarkdownParser();
+
+    // Provider deferred — ONNX native threads must not overlap with network I/O
     let provider: Awaited<ReturnType<typeof EmbedderFactory.createAndInit>> | null = null;
 
     const targets = opts.product
@@ -57,45 +58,85 @@ async function main(): Promise<void> {
     let totalChunks = 0;
 
     for (const product of targets) {
-        console.log(`\n📚  Crawling ${product.name} (${product.baseUrl})`);
-        const crawler = new DocCrawler(product, opts.limit);
+        const isGitHub = !!product.githubSource;
+
+        console.log(
+            `\n📚  Indexing ${product.name} via ${isGitHub ? '🐙 GitHub' : '🌐 web-crawl'}`
+        );
+
         const productStart = Date.now();
 
-        // ── Phase 1: Fetch + parse + chunk (concurrent, no I/O blocking per slot) ──
-        // pLimit slots are freed as soon as parse+chunk finishes (~5 ms/page),
-        // maximising network parallelism. Embedding is deliberately deferred.
         interface PendingPage {
             page: { url: string; contentHash: string };
             chunks: ReturnType<typeof chunker.chunk>;
         }
         const pending: PendingPage[] = [];
 
-        const { total, errors } = await crawler.crawl(async (page) => {
-            if (!opts.force) {
-                const existing = await vectorStore.getPageHash(page.url);
-                if (existing === page.contentHash) {
-                    process.stdout.write('.');
-                    return;
+        // ── Phase 1: Fetch + parse + chunk ───────────────────────────────────────
+
+        if (isGitHub && product.githubSource) {
+            // ── GitHub-native path ─────────────────────────────────────────────
+            const fetcher = new GitHubDocFetcher(
+                product.githubSource,
+                product.baseUrl,
+                opts.limit,
+            );
+
+            await fetcher.fetch(async (file) => {
+                if (!opts.force) {
+                    const existing = await vectorStore.getPageHash(file.url);
+                    if (existing === file.contentHash) {
+                        process.stdout.write('.');
+                        return;
+                    }
                 }
-            }
 
-            const parsed = parser.parse(page.html, page.url);
-            if (parsed.sections.length === 0) return;
+                const parsed = mdParser.parse(file.markdown, file.url, file.filePath);
+                if (parsed.sections.length === 0) return;
 
-            const chunks = chunker.chunk(parsed, {
-                product: product.id,
-                source_url: page.url,
-                title: parsed.title,
-                version: product.version,
+                const chunks = chunker.chunk(parsed, {
+                    product: product.id,
+                    source_url: file.url,
+                    title: parsed.title,
+                    version: product.version,
+                });
+                if (chunks.length === 0) return;
+
+                pending.push({
+                    page: { url: file.url, contentHash: file.contentHash },
+                    chunks,
+                });
             });
-            if (chunks.length === 0) return;
 
-            pending.push({ page, chunks });
-        });
+        } else {
+            // ── Legacy web-crawl path (ballerina, library) ─────────────────────
+            const crawler = new DocCrawler(product, opts.limit);
 
-        // ── Phase 2: Batch-embed all pending chunks in one pass ───────────────────
-        // Initialise the provider HERE — after all HTTP connections are closed —
-        // so ONNX Runtime native threads never overlap with fetch/gzip threads.
+            await crawler.crawl(async (page) => {
+                if (!opts.force) {
+                    const existing = await vectorStore.getPageHash(page.url);
+                    if (existing === page.contentHash) {
+                        process.stdout.write('.');
+                        return;
+                    }
+                }
+
+                const parsed = htmlParser.parse(page.html, page.url);
+                if (parsed.sections.length === 0) return;
+
+                const chunks = chunker.chunk(parsed, {
+                    product: product.id,
+                    source_url: page.url,
+                    title: parsed.title,
+                    version: product.version,
+                });
+                if (chunks.length === 0) return;
+
+                pending.push({ page, chunks });
+            });
+        }
+
+        // ── Phase 2: Batch-embed all pending chunks ───────────────────────────
         let productChunks = 0;
 
         if (pending.length > 0) {
@@ -105,7 +146,7 @@ async function main(): Promise<void> {
             const allChunks = pending.flatMap((p) => p.chunks);
             const embedded = await embedChunks(allChunks, provider);
 
-            // ── Phase 3: Write to DB (one page at a time, preserving atomicity) ──────
+            // ── Phase 3: Write to DB (one page at a time) ─────────────────────
             let offset = 0;
             for (const { page, chunks } of pending) {
                 const pageEmbedded = embedded.slice(offset, offset + chunks.length);
@@ -129,7 +170,7 @@ async function main(): Promise<void> {
 
         const elapsed = ((Date.now() - productStart) / 1000).toFixed(1);
         console.log(
-            `\n\n  ${product.name}: ${productChunks} chunks, ${total} pages fetched, ${errors} errors (${elapsed}s)`
+            `\n\n  ${product.name}: ${productChunks} chunks, ${pending.length} pages processed (${elapsed}s)`
         );
     }
 

@@ -5,6 +5,52 @@
 
 A production-ready **Model Context Protocol (MCP)** server that provides AI assistants (Claude Desktop, Claude Code, Cursor, VS Code) with semantic search over WSO2 documentation via Retrieval-Augmented Generation (RAG).
 
+Under the hood, it uses a blazing-fast dual-ingestion engine:
+- **GitHub Native:** Fetches raw Markdown directly from WSO2's public GitHub repositories via the Git Trees API (avoids web-scraping noise and rate limits)
+- **Web Crawl Fallback:** For products without dedicated GitHub docs repos (like the WSO2 Library)
+
+## Architecture
+
+```mermaid
+flowchart TD
+    %% Styling
+    classDef github fill:#1f2328,color:#fff,stroke:#e1e4e8
+    classDef default fill:#0969da,color:#fff,stroke:#0969da
+    classDef db fill:#218bff,color:#fff,stroke:#218bff
+    classDef web fill:#0969da,color:#fff,stroke:#0969da
+
+    subgraph Sources ["Information Sources"]
+        GH["GitHub Repos\n(wso2/docs-apim, etc.)"]:::github
+        Web["WSO2 Websites\n(ballerina.io, lib)"]:::web
+    end
+
+    subgraph Ingestion ["Dual-Ingestion Pipeline"]
+        A["GitHubDocFetcher\n(Git Trees API)"] 
+        B["DocCrawler\n(HTML scraping)"]
+        
+        C["MarkdownParser\n(Front-matter & Heads)"]
+        D["DocParser\n(Cheerio HTML parsing)"]
+        
+        E["DocChunker\n(Semantic Splitting)"]
+    end
+
+    subgraph Embedding ["Vectorization & Storage"]
+        F["EmbedderFactory\n(Ollama / HuggingFace)"]
+        G[("pgvector\n(PostgreSQL)")]:::db
+    end
+
+    %% Flow
+    GH --> A
+    Web --> B
+    
+    A -->|"Raw .md"| C
+    B -->|"Clean HTML"| D
+    
+    C -->|"ParsedSection[]"| E
+    D -->|"ParsedSection[]"| E
+    
+    E -->|"Tokens/Chunks"| F
+    F -->|"768-dim Vectors"| G
 ```bash
 npm install -g wso2-docs-mcp-server
 ```
@@ -419,7 +465,7 @@ DATABASE_URL=... node -e "
 src/
   config/          env.ts · constants.ts
   vectorstore/     pgvector.ts · schema.sql
-  ingestion/       crawler.ts · parser.ts · chunker.ts · embedder.ts
+  ingestion/       crawler.ts · parser.ts · githubFetcher.ts · markdownParser.ts · chunker.ts · embedder.ts
   server/          mcpServer.ts · toolRegistry.ts
   jobs/            reindexDocs.ts
   index.ts
