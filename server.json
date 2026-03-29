@@ -1,0 +1,57 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.iamvirul/wso2-docs-mcp-server",
+  "description": "Production-ready MCP server providing semantic search over WSO2 documentation (API Manager, Micro Integrator, Choreo, Ballerina, and more) via RAG — powered by pgvector and local-first embeddings (Ollama / HuggingFace ONNX).",
+  "repository": {
+    "url": "https://github.com/iamvirul/wso2-docs-mcp-server",
+    "source": "github"
+  },
+  "version": "1.2.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "wso2-docs-mcp-server",
+      "version": "1.2.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "DATABASE_URL",
+          "description": "PostgreSQL connection string for pgvector (e.g. postgresql://user:pass@localhost:5432/wso2docs)",
+          "isRequired": true,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "EMBEDDING_PROVIDER",
+          "description": "Embedding backend to use: ollama (default, local), openai, gemini, or voyage",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "description": "Required only when EMBEDDING_PROVIDER=openai",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "GEMINI_API_KEY",
+          "description": "Required only when EMBEDDING_PROVIDER=gemini",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "VOYAGE_API_KEY",
+          "description": "Required only when EMBEDDING_PROVIDER=voyage",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
