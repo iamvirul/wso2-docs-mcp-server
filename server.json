@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.iamvirul/wso2-docs-mcp-server",
-  "description": "Production-ready MCP server providing semantic search over WSO2 documentation (API Manager, Micro Integrator, Choreo, Ballerina, and more) via RAG — powered by pgvector and local-first embeddings (Ollama / HuggingFace ONNX).",
+  "description": "Semantic search over WSO2 docs (APIM, MI, Choreo, Ballerina) via RAG and pgvector.",
   "repository": {
     "url": "https://github.com/iamvirul/wso2-docs-mcp-server",
     "source": "github"
