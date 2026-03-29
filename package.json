@@ -1,6 +1,6 @@
 {
     "name": "wso2-docs-mcp-server",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
     "main": "dist/src/index.js",
     "bin": {
