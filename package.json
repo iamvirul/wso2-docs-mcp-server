@@ -1,6 +1,7 @@
 {
     "name": "wso2-docs-mcp-server",
-    "version": "1.1.0",
+    "version": "1.2.0",
+    "mcpName": "io.github.iamvirul/wso2-docs-mcp-server",
     "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
     "main": "dist/src/index.js",
     "bin": {
@@ -14,7 +15,8 @@
         "docker-compose.yml",
         "config-examples",
         "LICENSE",
-        "CHANGELOG.md"
+        "CHANGELOG.md",
+        "server.json"
     ],
     "repository": {
         "type": "git",

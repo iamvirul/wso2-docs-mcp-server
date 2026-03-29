@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-29
+
+### Added
+
+- **GitHub-Native Ingestion**: Fetches raw Markdown directly from WSO2's public GitHub repositories via the Git Trees API — one API call lists the entire repo tree, then files are fetched in parallel from `raw.githubusercontent.com`. Eliminates web-scraping noise, HTML parsing overhead, and rate-limit issues for products with dedicated docs repos.
+- **MarkdownParser**: New `src/ingestion/markdownParser.ts` — pure YAML front-matter + ATX heading parser that produces the same `ParsedPage` / `ParsedSection[]` format as the existing HTML `DocParser`, enabling the rest of the pipeline (chunker, embedder, pgvector) to be reused unchanged.
+- **Dual-Ingestion Pipeline**: Products with GitHub repos (`apim`, `mi`, `bi`, `choreo`, `ballerina`) are ingested via `GitHubDocFetcher` + `MarkdownParser`; products without (`library`) continue to use the `DocCrawler` + `DocParser` web-crawl path.
+- **Architecture diagram**: Added Mermaid flowchart to README illustrating the dual-ingestion architecture.
+
+### Changed
+
+- `scripts/crawl.ts` updated to route each product through the correct ingestion path (GitHub or web-crawl) based on the presence of a `githubSource` field in `PRODUCTS`.
+- `src/config/constants.ts` extended with `GitHubDocSource` type and `githubSource` config for all GitHub-hosted products.
+- README updated with dual-ingestion architecture section and corrected npm install setup guide.
+
+### Fixed
+
+- Mermaid architecture diagram in README had a malformed code-fence closing tag (` ```bash ` instead of ` ``` `), causing a parse error on GitHub.
+
 ## [1.1.0] - 2026-03-08
 
 ### Added
@@ -58,4 +77,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ONNX Runtime native thread conflict with concurrent HTTP+gzip threads (mutex lock failed / SIGABRT at exit code 134) — resolved by deferring provider initialization to after all network I/O completes
 - MCP server entry point path corrected (`dist/src/index.js` not `dist/index.js`) due to `tsconfig.json` `rootDir: "."`
 
+[1.2.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/iamvirul/wso2-docs-mcp-server/releases/tag/v1.0.0

@@ -51,8 +51,6 @@ flowchart TD
     
     E -->|"Tokens/Chunks"| F
     F -->|"768-dim Vectors"| G
-```bash
-npm install -g wso2-docs-mcp-server
 ```
 
 ## Documentation Sources
