@@ -49,7 +49,7 @@
         "test:ci": "vitest run --coverage --reporter=verbose"
     },
     "dependencies": {
-        "@google/generative-ai": "^0.21.0",
+        "@google/generative-ai": "^0.24.1",
         "@huggingface/transformers": "^3.8.1",
         "@modelcontextprotocol/sdk": "^1.5.0",
         "axios": "^1.6.8",
