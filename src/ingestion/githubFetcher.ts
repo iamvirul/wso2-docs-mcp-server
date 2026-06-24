@@ -3,8 +3,6 @@ import { createHash } from 'crypto';
 import pLimit from 'p-limit';
 import { GitHubDocSource } from '../config/constants';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 /** A fetched Markdown file from GitHub, drop-in replacement for CrawledPage */
 export interface FetchedFile {
     url: string;          // canonical docs-site URL for this page
@@ -20,8 +18,6 @@ interface GitTreeItem {
     sha: string;
     size?: number;
 }
-
-// ── GitHubDocFetcher ──────────────────────────────────────────────────────────
 
 /**
  * Fetches Markdown documentation from a public WSO2 GitHub repository.
@@ -58,8 +54,6 @@ export class GitHubDocFetcher {
         private readonly maxFiles?: number,
     ) { }
 
-    // ── Public API ────────────────────────────────────────────────────────────
-
     async fetch(
         onFile: (file: FetchedFile) => Promise<void>
     ): Promise<{ total: number; errors: number }> {
@@ -86,8 +80,6 @@ export class GitHubDocFetcher {
         return { total: paths.length - errors, errors };
     }
 
-    // ── Private: List all .md files via Git Trees API ─────────────────────────
-
     private async listMarkdownFiles(): Promise<string[]> {
         const { owner, repo, branch, docsPath } = this.source;
 
@@ -110,8 +102,6 @@ export class GitHubDocFetcher {
             })
             .map((item) => item.path);
     }
-
-    // ── Private: Fetch a single .md file from raw.githubusercontent.com ───────
 
     private async fetchFile(filePath: string): Promise<FetchedFile | null> {
         const { owner, repo, branch } = this.source;
@@ -136,8 +126,6 @@ export class GitHubDocFetcher {
             fetchedAt: new Date(),
         };
     }
-
-    // ── Private: Map repo file path → canonical docs-site URL ─────────────────
 
     /**
      * Convert a repo-relative file path to the public docs URL.

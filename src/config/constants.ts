@@ -1,4 +1,3 @@
-// ── GitHub source configuration ───────────────────────────────────────────────
 
 export interface GitHubDocSource {
     /** GitHub org or user, e.g. 'wso2' */
@@ -13,8 +12,6 @@ export interface GitHubDocSource {
      */
     docsPath: string;
 }
-
-// ── Product configuration ─────────────────────────────────────────────────────
 
 export interface ProductConfig {
     id: string;

@@ -6,8 +6,6 @@ import { env } from '../config/env';
 import { DocChunk } from './chunker';
 import { detectAccelerator } from './accelerator';
 
-// ── Ollama API types ──────────────────────────────────────────────────────────
-
 interface OllamaTagsResponse {
     models: Array<{ name: string }>;
 }
@@ -22,8 +20,6 @@ interface OllamaPullChunk {
     completed?: number;
 }
 
-// ── Provider Interface ────────────────────────────────────────────────────────
-
 export interface EmbeddingProvider {
     embed(texts: string[]): Promise<number[][]>;
     readonly dimensions: number;
@@ -34,8 +30,6 @@ export interface ChunkWithEmbedding {
     chunk: DocChunk;
     embedding: number[];
 }
-
-// ── HuggingFace Local Provider (ONNX, in-process, no server required) ────────
 
 class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
     // Typed as unknown to avoid importing the heavy type at module load time;
@@ -102,7 +96,6 @@ class HuggingFaceLocalEmbeddingProvider implements EmbeddingProvider {
     }
 }
 
-// ── Ollama Provider (local, no API key required) ──────────────────────────────
 // Falls back to HuggingFace local ONNX inference when Ollama is not running.
 
 class OllamaEmbeddingProvider implements EmbeddingProvider {
@@ -213,8 +206,6 @@ class OllamaEmbeddingProvider implements EmbeddingProvider {
     }
 }
 
-// ── OpenAI Provider ────────────────────────────────────────────────────────────
-
 class OpenAIEmbeddingProvider implements EmbeddingProvider {
     private client: OpenAI;
     readonly dimensions: number;
@@ -248,8 +239,6 @@ class OpenAIEmbeddingProvider implements EmbeddingProvider {
         return results;
     }
 }
-
-// ── Google Gemini Provider ─────────────────────────────────────────────────────
 
 class GeminiEmbeddingProvider implements EmbeddingProvider {
     private genAI: GoogleGenerativeAI;
@@ -287,8 +276,6 @@ class GeminiEmbeddingProvider implements EmbeddingProvider {
     }
 }
 
-// ── Voyage AI Provider (REST) ──────────────────────────────────────────────────
-
 class VoyageEmbeddingProvider implements EmbeddingProvider {
     private readonly apiKey: string;
     private readonly baseUrl = 'https://api.voyageai.com/v1';
@@ -324,8 +311,6 @@ class VoyageEmbeddingProvider implements EmbeddingProvider {
     }
 }
 
-// ── Factory ───────────────────────────────────────────────────────────────────
-
 export class EmbedderFactory {
     static create(): EmbeddingProvider {
         switch (env.EMBEDDING_PROVIDER) {
@@ -354,8 +339,6 @@ export class EmbedderFactory {
     }
 }
 
-// ── Batch embed helper ────────────────────────────────────────────────────────
-
 export async function embedChunks(
     chunks: DocChunk[],
     provider: EmbeddingProvider
@@ -365,8 +348,6 @@ export async function embedChunks(
     const embeddings = await provider.embed(texts);
     return chunks.map((chunk, i) => ({ chunk, embedding: embeddings[i] }));
 }
-
-// ── Retry helper ──────────────────────────────────────────────────────────────
 
 async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {

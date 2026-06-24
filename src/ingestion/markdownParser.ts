@@ -1,7 +1,5 @@
 import { ParsedPage, ParsedSection } from './parser';
 
-// ── MarkdownParser ────────────────────────────────────────────────────────────
-
 /**
  * Parses raw Markdown into ParsedPage — the same format produced by DocParser
  * from HTML. This means the chunker, embedder, and vector store are all reused
@@ -43,8 +41,6 @@ export class MarkdownParser {
         return { title: title.trim(), description: description.trim(), sections, rawText };
     }
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 interface Frontmatter {
     title?: string;

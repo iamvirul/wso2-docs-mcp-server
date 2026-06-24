@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Mock env ──────────────────────────────────────────────────────────────────
 vi.mock('../../../src/config/env', () => ({
     env: {
         EMBEDDING_PROVIDER: 'openai',
@@ -22,7 +21,6 @@ vi.mock('../../../src/config/env', () => ({
     },
 }));
 
-// ── Mock all 3rd-party SDKs (prevents real network/auth in tests) ─────────────
 vi.mock('openai', () => ({ default: vi.fn() }));
 vi.mock('@google/generative-ai', () => ({
     GoogleGenerativeAI: vi.fn(),
@@ -35,7 +33,6 @@ vi.mock('axios', () => ({
 import { embedChunks, EmbeddingProvider } from '../../../src/ingestion/embedder';
 import { DocChunk } from '../../../src/ingestion/chunker';
 
-// ── Lightweight stub provider (avoids new OpenAI() constructor issues) ────────
 const fakeEmbedding = Array(1536).fill(0.1);
 
 function makeProvider(embeds: number[][]): EmbeddingProvider {

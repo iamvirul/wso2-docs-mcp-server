@@ -1,8 +1,6 @@
 import { Pool } from 'pg';
 import { env } from '../config/env';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export interface UpsertChunkInput {
     product: string;
     title: string;
@@ -32,8 +30,6 @@ export interface SimilaritySearchOptions {
     product?: string;
     minScore?: number;
 }
-
-// ── Simple TTL-aware LRU cache ────────────────────────────────────────────────
 
 class LRUCache<K, V> {
     private cache = new Map<K, { value: V; expiresAt: number }>();
@@ -65,8 +61,6 @@ class LRUCache<K, V> {
     }
 }
 
-// ── PgVectorStore ─────────────────────────────────────────────────────────────
-
 export class PgVectorStore {
     private pool: Pool;
     private queryCache: LRUCache<string, DocSearchResult[]>;
@@ -96,8 +90,6 @@ export class PgVectorStore {
     async close(): Promise<void> {
         await this.pool.end();
     }
-
-    // ── Upsert ──────────────────────────────────────────────────────────────────
 
     async upsertChunks(chunks: UpsertChunkInput[]): Promise<void> {
         if (chunks.length === 0) return;
@@ -140,8 +132,6 @@ export class PgVectorStore {
         }
     }
 
-    // ── Similarity search ────────────────────────────────────────────────────────
-
     async similaritySearch(
         queryEmbedding: number[],
         opts: SimilaritySearchOptions = {}
@@ -173,8 +163,6 @@ export class PgVectorStore {
         this.queryCache.set(cacheKey, results);
         return results;
     }
-
-    // ── Crawl state ──────────────────────────────────────────────────────────────
 
     async getPageHash(url: string): Promise<string | null> {
         const { rows } = await this.pool.query(

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Mocks ─────────────────────────────────────────────────────────────────────
 vi.mock('../../../src/config/env', () => ({
     env: {
         DATABASE_URL: 'postgresql://test',
@@ -28,7 +27,6 @@ vi.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({
 
 import { registerTools, ToolDeps } from '../../../src/server/toolRegistry';
 
-// ── Mock McpServer that captures registered tools ─────────────────────────────
 type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
 function createMockServer() {
@@ -41,7 +39,6 @@ function createMockServer() {
     } as any;
 }
 
-// ── Mock deps ─────────────────────────────────────────────────────────────────
 const mockSimilaritySearch = vi.fn();
 const mockEmbed = vi.fn();
 

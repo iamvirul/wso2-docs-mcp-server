@@ -1,7 +1,5 @@
 import { execSync } from 'child_process';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export type AcceleratorBackend = 'metal' | 'cuda' | 'cpu';
 
 export interface AcceleratorConfig {
@@ -21,8 +19,6 @@ export interface AcceleratorConfig {
      */
     batchSize: number;
 }
-
-// ── Detection ─────────────────────────────────────────────────────────────────
 
 /**
  * Probes the current machine and returns the optimal ONNX Runtime config:
@@ -73,8 +69,6 @@ export function detectAccelerator(): AcceleratorConfig {
         batchSize: 16,
     };
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function isAppleSilicon(): boolean {
     return process.platform === 'darwin' && process.arch === 'arm64';

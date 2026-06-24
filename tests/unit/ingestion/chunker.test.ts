@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Mock env ──────────────────────────────────────────────────────────────────
 vi.mock('../../../src/config/env', () => ({
     env: {
         CHUNK_SIZE: 100,
@@ -24,8 +23,6 @@ vi.mock('../../../src/config/env', () => ({
 
 import { DocChunker } from '../../../src/ingestion/chunker';
 import { ParsedPage } from '../../../src/ingestion/parser';
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 /**
  * CHUNK_SIZE=100 tokens → ~400 chars minimum.
