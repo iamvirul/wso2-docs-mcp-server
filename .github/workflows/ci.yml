@@ -8,15 +8,12 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-permissions:
-  contents: read
-  actions: read
-  packages: read
 
 jobs:
   typecheck:
