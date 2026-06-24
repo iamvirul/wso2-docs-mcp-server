@@ -1,0 +1,6 @@
+paths-ignore:
+  - dist
+  - node_modules
+  - coverage
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
