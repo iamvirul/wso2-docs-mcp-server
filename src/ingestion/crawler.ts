@@ -5,16 +5,12 @@ import pLimit from 'p-limit';
 import { env } from '../config/env';
 import { ProductConfig, CRAWLER_DEFAULTS } from '../config/constants';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export interface CrawledPage {
     url: string;
     html: string;
     contentHash: string;
     fetchedAt: Date;
 }
-
-// ── DocCrawler ────────────────────────────────────────────────────────────────
 
 export class DocCrawler {
     private visited = new Set<string>();
@@ -34,8 +30,6 @@ export class DocCrawler {
     });
 
     constructor(private product: ProductConfig, private maxPages?: number) { }
-
-    // ── Public API ───────────────────────────────────────────────────────────────
 
     async crawl(
         onPage: (page: CrawledPage) => Promise<void>
@@ -62,8 +56,6 @@ export class DocCrawler {
         await Promise.all(tasks);
         return { total: limited.length - errors, errors };
     }
-
-    // ── URL Discovery ────────────────────────────────────────────────────────────
 
     private async discoverUrls(): Promise<string[]> {
         try {
@@ -136,8 +128,6 @@ export class DocCrawler {
 
         return found;
     }
-
-    // ── Fetch ────────────────────────────────────────────────────────────────────
 
     private async fetchPage(url: string): Promise<CrawledPage | null> {
         const html = await this._fetch(url);

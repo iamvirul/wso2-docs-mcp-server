@@ -11,65 +11,26 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    %% Styling
-    classDef github fill:#1f2328,color:#fff,stroke:#e1e4e8
-    classDef default fill:#0969da,color:#fff,stroke:#0969da
-    classDef db fill:#218bff,color:#fff,stroke:#218bff
-    classDef web fill:#0969da,color:#fff,stroke:#0969da
-
-    subgraph Sources ["Information Sources"]
-        GH["GitHub Repos\n(wso2/docs-apim, etc.)"]:::github
-        Web["WSO2 Websites\n(ballerina.io, lib)"]:::web
-    end
-
-    subgraph Ingestion ["Dual-Ingestion Pipeline"]
-        A["GitHubDocFetcher\n(Git Trees API)"] 
-        B["DocCrawler\n(HTML scraping)"]
-        
-        C["MarkdownParser\n(Front-matter & Heads)"]
-        D["DocParser\n(Cheerio HTML parsing)"]
-        
-        E["DocChunker\n(Semantic Splitting)"]
-    end
-
-    subgraph Embedding ["Vectorization & Storage"]
-        F["EmbedderFactory\n(Ollama / HuggingFace)"]
-        G[("pgvector\n(PostgreSQL)")]:::db
-    end
-
-    %% Flow
-    GH --> A
-    Web --> B
-    
-    A -->|"Raw .md"| C
-    B -->|"Clean HTML"| D
-    
-    C -->|"ParsedSection[]"| E
-    D -->|"ParsedSection[]"| E
-    
-    E -->|"Tokens/Chunks"| F
-    F -->|"768-dim Vectors"| G
-```
+![System Architecture](https://raw.githubusercontent.com/iamvirul/wso2-docs-mcp-server/main/docs/architecture.svg)
 
 ## Documentation Sources
 
-| Product | URL |
-|---|---|
-| API Manager | https://apim.docs.wso2.com |
-| Micro Integrator | https://mi.docs.wso2.com/en/4.4.0 |
-| Choreo | https://wso2.com/choreo/docs |
-| Ballerina | https://ballerina.io/learn |
-| Ballerina Integrator | https://bi.docs.wso2.com |
-| WSO2 Library | https://wso2.com/library |
+| Product | ID | URL |
+|---|---|---|
+| API Manager | `apim` | https://apim.docs.wso2.com |
+| Micro Integrator | `mi` | https://mi.docs.wso2.com/en/4.4.0 |
+| Ballerina Integrator | `bi` | https://bi.docs.wso2.com |
+| Choreo | `choreo` | https://wso2.com/choreo/docs |
+| Identity Server | `is` | https://is.docs.wso2.com/en/latest |
+| Ballerina | `ballerina` | https://ballerina.io/learn |
+| WSO2 Library | `library` | https://wso2.com/library |
 
 ## Prerequisites
 
 - **Node.js** ≥ 20
 - **Docker** (for pgvector)
-- **Embeddings** — no API key required by default:
-  - **[Ollama](https://ollama.com)** (recommended) — runs locally, model auto-downloaded on first run
+- **Embeddings** - no API key required by default:
+  - **[Ollama](https://ollama.com)** (recommended) - runs locally, model auto-downloaded on first run
   - If Ollama is not running, the server automatically falls back to **HuggingFace ONNX** (in-process, also downloads automatically)
   - Cloud providers are also supported: OpenAI, Google Gemini, Voyage AI
 
@@ -79,8 +40,8 @@ flowchart TD
 
 Choose the setup path that fits your use case:
 
-- **[Install from npm](#install-from-npm)** — simplest, no cloning required
-- **[Clone and build](#clone-and-build)** — for development or contributions
+- **[Install from npm](#install-from-npm)** - simplest, no cloning required
+- **[Clone and build](#clone-and-build)** - for development or contributions
 
 ---
 
@@ -92,7 +53,7 @@ Install the package globally to get the `wso2-docs-mcp-server`, `wso2-docs-crawl
 npm install -g wso2-docs-mcp-server
 ```
 
-> **Prefer no global install?** You can use `npx wso2-docs-mcp-server`, `npx wso2-docs-crawl`, and `npx wso2-docs-migrate` in every step below — just replace the bare command with its `npx` equivalent.
+> **Prefer no global install?** You can use `npx wso2-docs-mcp-server`, `npx wso2-docs-crawl`, and `npx wso2-docs-migrate` in every step below - just replace the bare command with its `npx` equivalent.
 
 #### 1. Start pgvector
 
@@ -112,7 +73,7 @@ ollama pull nomic-embed-text
 ollama serve
 ```
 
-> **No Ollama?** Skip this step. The server automatically falls back to HuggingFace ONNX — model downloads on first use with no extra setup.
+> **No Ollama?** Skip this step. The server automatically falls back to HuggingFace ONNX - model downloads on first use with no extra setup.
 
 #### 3. Run database migration
 
@@ -139,13 +100,13 @@ DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
   wso2-docs-crawl --force
 ```
 
-Available product IDs: `apim`, `mi`, `choreo`, `ballerina`, `bi`, `library`
+Available product IDs: `apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`
 
 #### 5. Configure your AI client
 
-The MCP server is launched on demand by your AI client — no background process needed.
+The MCP server is launched on demand by your AI client - no background process needed.
 
-**Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+**Claude Desktop** - edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -161,7 +122,7 @@ The MCP server is launched on demand by your AI client — no background process
 }
 ```
 
-**Claude Code** — run once in your terminal:
+**Claude Code** - run once in your terminal:
 
 ```bash
 claude mcp add wso2-docs \
@@ -174,7 +135,7 @@ claude mcp add wso2-docs \
 claude mcp list
 ```
 
-**Cursor** — create `.cursor/mcp.json` in your project root:
+**Cursor** - create `.cursor/mcp.json` in your project root:
 
 ```json
 {
@@ -190,7 +151,7 @@ claude mcp list
 }
 ```
 
-**VS Code** — create `.vscode/mcp.json`:
+**VS Code** - create `.vscode/mcp.json`:
 
 ```json
 {
@@ -231,7 +192,7 @@ npm install
 ollama serve
 ```
 
-> **No Ollama?** Skip this step. The server detects Ollama is not running and automatically falls back to HuggingFace ONNX inference — the model downloads on first use with no extra setup.
+> **No Ollama?** Skip this step. The server detects Ollama is not running and automatically falls back to HuggingFace ONNX inference - the model downloads on first use with no extra setup.
 
 #### 3. Configure environment
 
@@ -286,7 +247,7 @@ npm run dev
 
 > Replace `/ABSOLUTE/PATH/TO/wso2-docs-mcp-server` with your actual clone path.
 
-**Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+**Claude Desktop** - edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -318,9 +279,9 @@ claude mcp list
 
 See `config-examples/claude_code.sh` for a convenience script.
 
-**Cursor** — create `.cursor/mcp.json` — see `config-examples/cursor_mcp.json`.
+**Cursor** - create `.cursor/mcp.json` - see `config-examples/cursor_mcp.json`.
 
-**VS Code** — create `.vscode/mcp.json` — see `config-examples/vscode_mcp.json`.
+**VS Code** - create `.vscode/mcp.json` - see `config-examples/vscode_mcp.json`.
 
 ---
 
@@ -329,7 +290,7 @@ See `config-examples/claude_code.sh` for a convenience script.
 | Tool | Description |
 |---|---|
 | `search_wso2_docs` | Semantic search across all products. Optional `product` and `limit` filters. |
-| `get_wso2_guide` | Search within a specific product (`apim`, `mi`, `choreo`, `ballerina`, `bi`, `library`). |
+| `get_wso2_guide` | Search within a specific product (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`). |
 | `explain_wso2_concept` | Broad concept search across all products, returns 8 top results. |
 | `list_wso2_products` | Returns all supported products with IDs and base URLs. |
 
@@ -386,7 +347,7 @@ q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~1
 
 > **Note:** For small crawls (≤ 10 pages) total wall-clock time is dominated by network I/O
 > (HTTPS fetches to docs sites), so the end-to-end improvement is modest. The embedding
-> speedup becomes significant at scale — crawling 500+ pages where embedding previously
+> speedup becomes significant at scale - crawling 500+ pages where embedding previously
 > accounted for hours of runtime. For best crawl performance, run Ollama (`ollama serve`)
 > which parallelises inference natively and has no per-chunk overhead.
 
@@ -398,7 +359,7 @@ q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~1
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | — | PostgreSQL connection string (required) |
+| `DATABASE_URL` | - | PostgreSQL connection string (required) |
 | `EMBEDDING_PROVIDER` | `ollama` | `ollama` \| `openai` \| `gemini` \| `voyage` |
 | `EMBEDDING_DIMENSIONS` | `768` | Must match model output dimensions |
 | `CRAWL_CONCURRENCY` | `5` | Concurrent HTTP requests during crawl |
@@ -419,11 +380,11 @@ q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~1
 
 | Variable | Default | Description |
 |---|---|---|
-| `OPENAI_API_KEY` | — | Required if `EMBEDDING_PROVIDER=openai` |
+| `OPENAI_API_KEY` | - | Required if `EMBEDDING_PROVIDER=openai` |
 | `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI model |
-| `GEMINI_API_KEY` | — | Required if `EMBEDDING_PROVIDER=gemini` |
+| `GEMINI_API_KEY` | - | Required if `EMBEDDING_PROVIDER=gemini` |
 | `GEMINI_EMBEDDING_MODEL` | `text-embedding-004` | Gemini model |
-| `VOYAGE_API_KEY` | — | Required if `EMBEDDING_PROVIDER=voyage` |
+| `VOYAGE_API_KEY` | - | Required if `EMBEDDING_PROVIDER=voyage` |
 | `VOYAGE_EMBEDDING_MODEL` | `voyage-3` | Voyage model |
 
 ### Embedding dimension reference

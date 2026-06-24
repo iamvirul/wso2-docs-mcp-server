@@ -3,12 +3,8 @@ import { MarkdownParser } from '../../../src/ingestion/markdownParser';
 
 const parser = new MarkdownParser();
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 /** Build a minimal markdown document */
 const md = (content: string) => content.trim();
-
-// ── Title extraction ──────────────────────────────────────────────────────────
 
 describe('MarkdownParser', () => {
     describe('parse() — title extraction', () => {
@@ -75,8 +71,6 @@ Content for this section with enough text to be included.
         });
     });
 
-    // ── Description extraction ────────────────────────────────────────────────
-
     describe('parse() — description extraction', () => {
         it('extracts description from YAML front-matter', () => {
             const input = md(`
@@ -127,8 +121,6 @@ Content without front-matter with enough text to be included.
         });
     });
 
-    // ── Front-matter edge cases ───────────────────────────────────────────────
-
     describe('parse() — front-matter edge cases', () => {
         it('handles malformed front-matter without closing ---', () => {
             const input = md(`
@@ -152,8 +144,6 @@ Content here without any front-matter at the top of the document.
             expect(result.sections.length).toBeGreaterThan(0);
         });
     });
-
-    // ── Section parsing ───────────────────────────────────────────────────────
 
     describe('parse() — section extraction', () => {
         it('creates sections at H2 heading boundaries', () => {
@@ -241,8 +231,6 @@ Introduction content explaining the overview with enough text content here.
             expect(rawText.length).toBeGreaterThan(0);
         });
     });
-
-    // ── Markdown decoration stripping ─────────────────────────────────────────
 
     describe('parse() — text cleaning', () => {
         it('strips bold markers', () => {
@@ -350,8 +338,6 @@ Real content that should appear in the section text output here.
         });
     });
 
-    // ── Code fence handling ───────────────────────────────────────────────────
-
     describe('parse() — code fence handling', () => {
         it('collapses ``` fenced code block into a [code: ...] summary', () => {
             const input = md(`
@@ -415,8 +401,6 @@ Continuation text here to ensure the section has enough content.
             expect(result).toBeDefined();
         });
     });
-
-    // ── Output structure ──────────────────────────────────────────────────────
 
     describe('parse() — output structure', () => {
         it('returns a valid ParsedPage with all required fields', () => {

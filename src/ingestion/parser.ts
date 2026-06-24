@@ -1,7 +1,5 @@
 import * as cheerio from 'cheerio';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export interface ParsedSection {
     heading: string;
     text: string;
@@ -14,8 +12,6 @@ export interface ParsedPage {
     sections: ParsedSection[];
     rawText: string;
 }
-
-// ── DocParser ─────────────────────────────────────────────────────────────────
 
 export class DocParser {
     private static readonly NOISE_SELECTORS = [
@@ -30,7 +26,6 @@ export class DocParser {
     parse(html: string, url: string): ParsedPage {
         const $ = cheerio.load(html);
 
-        // ── Extract metadata ───────────────────────────────────────────────────────
         const title =
             $('meta[property="og:title"]').attr('content') ||
             $('title').text() ||
@@ -42,12 +37,10 @@ export class DocParser {
             $('meta[property="og:description"]').attr('content') ||
             '';
 
-        // ── Remove noise ───────────────────────────────────────────────────────────
         $(DocParser.NOISE_SELECTORS).remove();
         $('[class*="cookie"]').remove();
         $('[id*="cookie"]').remove();
 
-        // ── Extract main content ───────────────────────────────────────────────────
         const contentEl =
             $('main').first().length
                 ? $('main').first()
@@ -57,7 +50,6 @@ export class DocParser {
                         ? $('[role="main"]').first()
                         : $('body');
 
-        // ── Section extraction ─────────────────────────────────────────────────────
         const sections: ParsedSection[] = [];
         let currentHeading = '';
         let currentLevel = 0;
@@ -87,7 +79,6 @@ export class DocParser {
         });
         flush();
 
-        // ── Fallback: plain text from entire content ────────────────────────────────
         if (sections.length === 0) {
             const rawText = contentEl.text().replace(/\s+/g, ' ').trim();
             if (rawText.length > 50) {

@@ -1,4 +1,3 @@
-// ── GitHub source configuration ───────────────────────────────────────────────
 
 export interface GitHubDocSource {
     /** GitHub org or user, e.g. 'wso2' */
@@ -13,8 +12,6 @@ export interface GitHubDocSource {
      */
     docsPath: string;
 }
-
-// ── Product configuration ─────────────────────────────────────────────────────
 
 export interface ProductConfig {
     id: string;
@@ -101,6 +98,20 @@ export const PRODUCTS: Record<string, ProductConfig> = {
         sitemapUrl: 'https://wso2.com/sitemap.xml',
         description: 'WSO2 whitepapers, articles, case studies, and resources',
         // No githubSource — no dedicated docs repo; keeps its web-crawl path
+    },
+    is: {
+        id: 'is',
+        name: 'Identity Server',
+        baseUrl: 'https://is.docs.wso2.com/en/latest',
+        sitemapUrl: 'https://is.docs.wso2.com/sitemap.xml',
+        description: 'WSO2 Identity Server — enterprise identity and access management (IAM)',
+        githubSource: {
+            owner: 'wso2',
+            repo: 'docs-is',
+            branch: 'master',
+            // 'next' maps to the published /en/latest/ site
+            docsPath: 'en/identity-server/next/docs',
+        },
     },
 };
 

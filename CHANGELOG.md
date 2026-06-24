@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-24
+
+### Added
+
+- **WSO2 Identity Server (IS) Support**: Added `is` as a supported product with GitHub-native ingestion from WSO2's Identity Server documentation repository (`wso2/docs-is`). Covers the full IS docs tree including concepts, guides, references, and deploy sections.
+- **Dependabot**: Added `.github/dependabot.yml` for automated npm dependency update PRs on a weekly schedule.
+
+### Changed
+
+- **Architecture Diagram**: Replaced the Mermaid flowchart in `README.md` with a standalone SVG (`docs/architecture.svg`) for consistent rendering across GitHub, npm, and all documentation viewers — Mermaid has inconsistent support outside of GitHub markdown.
+- **README**: Updated documentation sources table to include WSO2 Identity Server and refreshed the architecture section to reference the new SVG diagram.
+
+### Fixed
+
+- **IS Ingestion**: `githubFetcher.ts` now skips the `/apis/` directory in the IS repository. These files are Redoc template wrappers that contain no extractable text content, resulting in empty chunks being indexed.
+
+### Internal
+
+- Removed AI-generated decorative separator comments across all source files (`src/`, `scripts/`, `tests/`) to keep the codebase clean and human-managed.
+
 ## [1.2.0] - 2026-03-29
 
 ### Added
@@ -77,6 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ONNX Runtime native thread conflict with concurrent HTTP+gzip threads (mutex lock failed / SIGABRT at exit code 134) — resolved by deferring provider initialization to after all network I/O completes
 - MCP server entry point path corrected (`dist/src/index.js` not `dist/index.js`) due to `tsconfig.json` `rootDir: "."`
 
+[1.3.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/iamvirul/wso2-docs-mcp-server/releases/tag/v1.0.0

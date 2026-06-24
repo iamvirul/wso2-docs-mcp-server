@@ -7,8 +7,6 @@ import { PgVectorStore } from '../vectorstore/pgvector';
 import { PRODUCTS, ProductConfig } from '../config/constants';
 import cron from 'node-cron';
 
-// ── ReindexJob ────────────────────────────────────────────────────────────────
-
 export class ReindexJob {
     private vectorStore: PgVectorStore;
     private parser: DocParser;
@@ -28,8 +26,6 @@ export class ReindexJob {
         await this.vectorStore.close();
     }
 
-    // ── Reindex a single product ──────────────────────────────────────────────────
-
     async reindexProduct(product: ProductConfig, maxPages?: number): Promise<void> {
         // Provider is initialised AFTER the fetch phase to avoid a native-thread
         // mutex conflict between ONNX Runtime and concurrent HTTP+gzip connections.
@@ -39,7 +35,6 @@ export class ReindexJob {
         console.log(`\n🔄  Reindexing ${product.name}…`);
         let skipped = 0;
 
-        // ── Phase 1: Fetch + parse + chunk (concurrent, no embed in hot path) ────
         interface PendingPage {
             page: { url: string; contentHash: string };
             chunks: ReturnType<DocChunker['chunk']>;
@@ -67,7 +62,6 @@ export class ReindexJob {
             pending.push({ page, chunks });
         });
 
-        // ── Phase 2: Batch-embed all pending chunks in one pass ──────────────────
         let updated = 0;
 
         if (pending.length > 0) {
@@ -77,7 +71,6 @@ export class ReindexJob {
             const allChunks = pending.flatMap((p) => p.chunks);
             const embedded = await embedChunks(allChunks, provider);
 
-            // ── Phase 3: Write to DB ─────────────────────────────────────────────────
             let offset = 0;
             for (const { page, chunks } of pending) {
                 const pageEmbedded = embedded.slice(offset, offset + chunks.length);
@@ -103,8 +96,6 @@ export class ReindexJob {
         );
     }
 
-    // ── Reindex all products ──────────────────────────────────────────────────────
-
     async reindexAll(maxPagesPerProduct?: number): Promise<void> {
         console.log('🚀  Starting full reindex…');
         const start = Date.now();
@@ -121,8 +112,6 @@ export class ReindexJob {
         );
     }
 
-    // ── Scheduled job ────────────────────────────────────────────────────────────
-
     scheduleDaily(cronExpression = '0 2 * * *'): void {
         console.log(`⏰  Scheduled reindex: ${cronExpression}`);
         cron.schedule(cronExpression, async () => {
@@ -135,8 +124,6 @@ export class ReindexJob {
         });
     }
 }
-
-// ── CLI entrypoint ────────────────────────────────────────────────────────────
 
 if (require.main === module) {
     const job = new ReindexJob();

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Hoist Pool mock fns using vi.hoisted ──────────────────────────────────────
 const mocks = vi.hoisted(() => {
     const mockConnect = vi.fn();
     const mockPoolQuery = vi.fn();
@@ -8,7 +7,6 @@ const mocks = vi.hoisted(() => {
     return { mockConnect, mockPoolQuery, mockEnd };
 });
 
-// ── Mock env ──────────────────────────────────────────────────────────────────
 vi.mock('../../../src/config/env', () => ({
     env: {
         DATABASE_URL: 'postgresql://test',
@@ -30,7 +28,6 @@ vi.mock('../../../src/config/env', () => ({
     },
 }));
 
-// ── Mock pg: Pool as a proper class constructor ───────────────────────────────
 vi.mock('pg', () => ({
     Pool: class MockPool {
         connect = mocks.mockConnect;
@@ -40,8 +37,6 @@ vi.mock('pg', () => ({
 }));
 
 import { PgVectorStore, UpsertChunkInput } from '../../../src/vectorstore/pgvector';
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const makeChunk = (overrides: Partial<UpsertChunkInput> = {}): UpsertChunkInput => ({
     product: 'apim', title: 'Test Doc', section: 'Overview',

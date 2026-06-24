@@ -29,14 +29,10 @@ program
 
 const opts = program.opts<{ product?: string; limit?: number; force: boolean }>();
 
-// ── Validation ─────────────────────────────────────────────────────────────────
-
 if (opts.product && !PRODUCT_IDS.includes(opts.product)) {
     console.error(`Unknown product "${opts.product}". Valid: ${PRODUCT_IDS.join(', ')}`);
     process.exit(1);
 }
-
-// ── Main ───────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
     const vectorStore = new PgVectorStore();
@@ -72,10 +68,7 @@ async function main(): Promise<void> {
         }
         const pending: PendingPage[] = [];
 
-        // ── Phase 1: Fetch + parse + chunk ───────────────────────────────────────
-
         if (isGitHub && product.githubSource) {
-            // ── GitHub-native path ─────────────────────────────────────────────
             const fetcher = new GitHubDocFetcher(
                 product.githubSource,
                 product.baseUrl,
@@ -109,7 +102,6 @@ async function main(): Promise<void> {
             });
 
         } else {
-            // ── Legacy web-crawl path (ballerina, library) ─────────────────────
             const crawler = new DocCrawler(product, opts.limit);
 
             await crawler.crawl(async (page) => {
@@ -136,7 +128,6 @@ async function main(): Promise<void> {
             });
         }
 
-        // ── Phase 2: Batch-embed all pending chunks ───────────────────────────
         let productChunks = 0;
 
         if (pending.length > 0) {
@@ -146,7 +137,6 @@ async function main(): Promise<void> {
             const allChunks = pending.flatMap((p) => p.chunks);
             const embedded = await embedChunks(allChunks, provider);
 
-            // ── Phase 3: Write to DB (one page at a time) ─────────────────────
             let offset = 0;
             for (const { page, chunks } of pending) {
                 const pageEmbedded = embedded.slice(offset, offset + chunks.length);

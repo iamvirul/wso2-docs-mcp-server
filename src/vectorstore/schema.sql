@@ -6,7 +6,6 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- ── Main document chunks table ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS doc_chunks (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   product      TEXT        NOT NULL,
@@ -33,7 +32,6 @@ CREATE INDEX IF NOT EXISTS doc_chunks_product_idx    ON doc_chunks (product);
 CREATE INDEX IF NOT EXISTS doc_chunks_url_idx        ON doc_chunks (source_url);
 CREATE INDEX IF NOT EXISTS doc_chunks_hash_idx       ON doc_chunks (content_hash);
 
--- ── Crawl state for incremental updates ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS crawl_state (
   url          TEXT        PRIMARY KEY,
   page_hash    TEXT        NOT NULL,
@@ -41,7 +39,6 @@ CREATE TABLE IF NOT EXISTS crawl_state (
   chunk_count  INTEGER     DEFAULT 0
 );
 
--- ── Auto-update updated_at ────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN

@@ -5,9 +5,7 @@ import { EmbeddingProvider } from '../ingestion/embedder';
 import { z } from 'zod';
 import { PRODUCTS } from '../config/constants';
 
-// ── Hoisted schemas (prevents TS2589 deep type instantiation) ─────────────────
-
-const productEnum = z.enum(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library']);
+const productEnum = z.enum(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library', 'is']);
 
 const searchDocsSchema = {
     query: z.string().min(1).describe('Natural language search query'),
@@ -24,8 +22,6 @@ const explainConceptSchema = {
     concept: z.string().min(1).describe('The WSO2 concept, feature, or term to explain'),
 };
 
-// ── Types shared across tools ─────────────────────────────────────────────────
-
 export interface ToolDeps {
     vectorStore: PgVectorStore;
     embeddingProvider: EmbeddingProvider;
@@ -40,16 +36,12 @@ export interface RagResult {
     score: number;
 }
 
-// ── Tool registration ─────────────────────────────────────────────────────────
-
 export function registerTools(server: McpServer, deps: ToolDeps): void {
     registerSearchDocs(server, deps);
     registerGetGuide(server, deps);
     registerExplainConcept(server, deps);
     registerListProducts(server);
 }
-
-// ── search_wso2_docs ──────────────────────────────────────────────────────────
 
 function registerSearchDocs(server: McpServer, deps: ToolDeps): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
@@ -83,8 +75,6 @@ function registerSearchDocs(server: McpServer, deps: ToolDeps): void {
     );
 }
 
-// ── get_wso2_guide ────────────────────────────────────────────────────────────
-
 function registerGetGuide(server: McpServer, deps: ToolDeps): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
     server.tool(
@@ -117,8 +107,6 @@ function registerGetGuide(server: McpServer, deps: ToolDeps): void {
         }
     );
 }
-
-// ── explain_wso2_concept ──────────────────────────────────────────────────────
 
 function registerExplainConcept(server: McpServer, deps: ToolDeps): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
@@ -157,8 +145,6 @@ function registerExplainConcept(server: McpServer, deps: ToolDeps): void {
     );
 }
 
-// ── list_wso2_products ────────────────────────────────────────────────────────
-
 function registerListProducts(server: McpServer): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
     server.tool(
@@ -180,8 +166,6 @@ function registerListProducts(server: McpServer): void {
         }
     );
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function toRagResults(results: DocSearchResult[]): RagResult[] {
     return results.map((r) => ({

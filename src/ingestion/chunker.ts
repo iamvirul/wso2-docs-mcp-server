@@ -1,8 +1,6 @@
 import { env } from '../config/env';
 import { ParsedPage } from './parser';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export interface DocChunk {
     product: string;
     title: string;
@@ -21,8 +19,6 @@ interface ChunkerOptions {
     title: string;
     version?: string;
 }
-
-// ── DocChunker ────────────────────────────────────────────────────────────────
 
 export class DocChunker {
     private chunkSize: number;
@@ -97,8 +93,6 @@ export class DocChunker {
         return chunks.length > 0 ? chunks : [text];
     }
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Approximate token count (1 token ≈ 4 chars) */
 function tokens(text: string): number {
