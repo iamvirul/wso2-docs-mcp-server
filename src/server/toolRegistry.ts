@@ -7,7 +7,7 @@ import { PRODUCTS } from '../config/constants';
 
 // ── Hoisted schemas (prevents TS2589 deep type instantiation) ─────────────────
 
-const productEnum = z.enum(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library']);
+const productEnum = z.enum(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library', 'is']);
 
 const searchDocsSchema = {
     query: z.string().min(1).describe('Natural language search query'),

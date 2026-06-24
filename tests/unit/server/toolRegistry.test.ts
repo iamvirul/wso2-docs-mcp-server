@@ -206,12 +206,12 @@ describe('list_wso2_products handler', () => {
         registerTools(server, deps);
     });
 
-    it('returns all 6 products', async () => {
+    it('returns all 7 products', async () => {
         const handler = server.registeredTools.get('list_wso2_products')!.handler;
         const response = await handler({}) as any;
         const products = JSON.parse(response.content[0].text);
 
-        expect(products).toHaveLength(6);
+        expect(products).toHaveLength(7);
     });
 
     it('each product has id, name, description, base_url', async () => {
