@@ -5,7 +5,6 @@ import { DocChunker } from '../ingestion/chunker';
 import { EmbedderFactory, embedChunks } from '../ingestion/embedder';
 import { PgVectorStore } from '../vectorstore/pgvector';
 import { PRODUCTS, ProductConfig } from '../config/constants';
-import cron from 'node-cron';
 
 export class ReindexJob {
     private vectorStore: PgVectorStore;
@@ -112,7 +111,8 @@ export class ReindexJob {
         );
     }
 
-    scheduleDaily(cronExpression = '0 2 * * *'): void {
+    async scheduleDaily(cronExpression = '0 2 * * *'): Promise<void> {
+        const { default: cron } = await import('node-cron');
         console.log(`⏰  Scheduled reindex: ${cronExpression}`);
         cron.schedule(cronExpression, async () => {
             console.log(`\n[${new Date().toISOString()}] Running scheduled reindex…`);
