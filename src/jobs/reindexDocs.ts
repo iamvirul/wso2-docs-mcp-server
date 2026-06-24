@@ -1,10 +1,12 @@
 import { createHash } from 'crypto';
+import { fileURLToPath } from 'url';
 import { DocCrawler } from '../ingestion/crawler';
 import { DocParser } from '../ingestion/parser';
 import { DocChunker } from '../ingestion/chunker';
 import { EmbedderFactory, embedChunks } from '../ingestion/embedder';
 import { PgVectorStore } from '../vectorstore/pgvector';
 import { PRODUCTS, ProductConfig } from '../config/constants';
+import cron from 'node-cron';
 
 export class ReindexJob {
     private vectorStore: PgVectorStore;
@@ -110,7 +112,6 @@ export class ReindexJob {
     }
 
     async scheduleDaily(cronExpression = '0 2 * * *'): Promise<void> {
-        const { default: cron } = await import('node-cron');
         console.log(`⏰  Scheduled reindex: ${cronExpression}`);
         cron.schedule(cronExpression, async () => {
             console.log(`\n[${new Date().toISOString()}] Running scheduled reindex…`);
@@ -123,7 +124,7 @@ export class ReindexJob {
     }
 }
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const job = new ReindexJob();
     job
         .initialize()
