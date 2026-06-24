@@ -65,9 +65,7 @@ export class ReindexJob {
         let updated = 0;
 
         if (pending.length > 0) {
-            if (!provider) {
-                provider = await EmbedderFactory.createAndInit();
-            }
+            provider = await EmbedderFactory.createAndInit();
             const allChunks = pending.flatMap((p) => p.chunks);
             const embedded = await embedChunks(allChunks, provider);
 
