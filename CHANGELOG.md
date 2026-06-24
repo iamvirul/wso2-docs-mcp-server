@@ -24,6 +24,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 - Removed AI-generated decorative separator comments across all source files (`src/`, `scripts/`, `tests/`) to keep the codebase clean and human-managed.
+- **ESM conversion**: Converted the project from CommonJS to native ESM (`"type": "module"` in `package.json`, `module: ESNext` + `moduleResolution: bundler` in `tsconfig.json`). Required by `commander` v15 and `node-cron` v4, which are both ESM-only. `moduleResolution: bundler` avoids `.js` extension requirements on relative imports and is compatible with both TypeScript 5.x and 6.x.
+- `src/jobs/reindexDocs.ts`: replaced `require.main === module` (CJS-only) with `process.argv[1] === fileURLToPath(import.meta.url)`.
+- Code scanning alerts resolved: added explicit `permissions` blocks to CI and release workflows; removed useless conditional from CodeQL workflow (alerts #2, #3, #6). Fixed duplicate `permissions` key in `ci.yml` introduced by the autofix.
+
+### Dependencies
+
+- **TypeScript** `5.9.3` → `6.0.3`
+- **openai** `4.104.0` → `6.44.0`
+- **@huggingface/transformers** `3.8.1` → `4.2.0`
+- **commander** `12.1.0` → `15.0.0`
+- **dotenv** `16.6.1` → `17.4.2`
+- **node-cron** `3.0.3` → `4.5.0`
+- **@types/node** `20.19.37` → `26.0.0`
+- **actions/checkout** `v4` → `v7`
+- **actions/setup-node** `v4` → `v6`
+- **actions/upload-artifact** `v4` → `v7`
+- **softprops/action-gh-release** `v2` → `v3`
 
 ## [1.2.0] - 2026-03-29
 
