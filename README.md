@@ -13,56 +13,72 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 
 ```mermaid
 flowchart TD
-    %% Styling
-    classDef github fill:#1f2328,color:#fff,stroke:#e1e4e8
-    classDef default fill:#0969da,color:#fff,stroke:#0969da
-    classDef db fill:#218bff,color:#fff,stroke:#218bff
-    classDef web fill:#0969da,color:#fff,stroke:#0969da
-
-    subgraph Sources ["Information Sources"]
-        GH["GitHub Repos\n(wso2/docs-apim, etc.)"]:::github
-        Web["WSO2 Websites\n(ballerina.io, lib)"]:::web
+    subgraph Sources ["Documentation Sources (GitHub-native)"]
+        S1["wso2/docs-apim"]
+        S2["wso2/docs-mi"]
+        S3["wso2/docs-bi"]
+        S4["wso2/docs-choreo-dev"]
+        S5["wso2/docs-is"]
     end
 
-    subgraph Ingestion ["Dual-Ingestion Pipeline"]
-        A["GitHubDocFetcher\n(Git Trees API)"] 
-        B["DocCrawler\n(HTML scraping)"]
-        
-        C["MarkdownParser\n(Front-matter & Heads)"]
-        D["DocParser\n(Cheerio HTML parsing)"]
-        
-        E["DocChunker\n(Semantic Splitting)"]
+    subgraph WebSources ["Documentation Sources (Web Crawl)"]
+        W1["ballerina.io"]
+        W2["wso2.com/library"]
     end
 
-    subgraph Embedding ["Vectorization & Storage"]
-        F["EmbedderFactory\n(Ollama / HuggingFace)"]
-        G[("pgvector\n(PostgreSQL)")]:::db
+    subgraph Ingestion ["Ingestion Pipeline"]
+        GF["GitHubDocFetcher\nGit Trees API — one call per repo"]
+        WC["DocCrawler\nSitemap + Cheerio HTML scraping"]
+        MP["MarkdownParser\nFront-matter · headings · sections"]
+        HP["DocParser\nCheerio HTML → structured text"]
+        CK["DocChunker\n~800 token semantic splits with overlap"]
     end
 
-    %% Flow
-    GH --> A
-    Web --> B
-    
-    A -->|"Raw .md"| C
-    B -->|"Clean HTML"| D
-    
-    C -->|"ParsedSection[]"| E
-    D -->|"ParsedSection[]"| E
-    
-    E -->|"Tokens/Chunks"| F
-    F -->|"768-dim Vectors"| G
+    subgraph VectorStore ["Embedding & Storage"]
+        EM["EmbeddingProvider\nOllama · HuggingFace ONNX · OpenAI · Gemini · Voyage"]
+        PG[("pgvector\nPostgreSQL")]
+    end
+
+    subgraph Server ["MCP Server  stdio"]
+        T1["search_wso2_docs"]
+        T2["get_wso2_guide"]
+        T3["explain_wso2_concept"]
+        T4["list_wso2_products"]
+    end
+
+    subgraph Clients ["AI Clients"]
+        C1["Claude Desktop"]
+        C2["Claude Code"]
+        C3["Cursor"]
+        C4["VS Code"]
+    end
+
+    S1 & S2 & S3 & S4 & S5 --> GF
+    W1 & W2 --> WC
+
+    GF -->|"Raw Markdown"| MP
+    WC -->|"HTML"| HP
+
+    MP & HP -->|"ParsedDoc"| CK
+    CK -->|"DocChunk[]"| EM
+    EM -->|"float[] vectors"| PG
+
+    C1 & C2 & C3 & C4 -->|"MCP tool call"| T1 & T2 & T3
+    T1 & T2 & T3 -->|"embed → cosine search"| PG
+    PG -->|"top-k chunks"| T1 & T2 & T3
 ```
 
 ## Documentation Sources
 
-| Product | URL |
-|---|---|
-| API Manager | https://apim.docs.wso2.com |
-| Micro Integrator | https://mi.docs.wso2.com/en/4.4.0 |
-| Choreo | https://wso2.com/choreo/docs |
-| Ballerina | https://ballerina.io/learn |
-| Ballerina Integrator | https://bi.docs.wso2.com |
-| WSO2 Library | https://wso2.com/library |
+| Product | ID | URL |
+|---|---|---|
+| API Manager | `apim` | https://apim.docs.wso2.com |
+| Micro Integrator | `mi` | https://mi.docs.wso2.com/en/4.4.0 |
+| Ballerina Integrator | `bi` | https://bi.docs.wso2.com |
+| Choreo | `choreo` | https://wso2.com/choreo/docs |
+| Identity Server | `is` | https://is.docs.wso2.com/en/latest |
+| Ballerina | `ballerina` | https://ballerina.io/learn |
+| WSO2 Library | `library` | https://wso2.com/library |
 
 ## Prerequisites
 
@@ -139,7 +155,7 @@ DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
   wso2-docs-crawl --force
 ```
 
-Available product IDs: `apim`, `mi`, `choreo`, `ballerina`, `bi`, `library`
+Available product IDs: `apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`
 
 #### 5. Configure your AI client
 
@@ -329,7 +345,7 @@ See `config-examples/claude_code.sh` for a convenience script.
 | Tool | Description |
 |---|---|
 | `search_wso2_docs` | Semantic search across all products. Optional `product` and `limit` filters. |
-| `get_wso2_guide` | Search within a specific product (`apim`, `mi`, `choreo`, `ballerina`, `bi`, `library`). |
+| `get_wso2_guide` | Search within a specific product (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`). |
 | `explain_wso2_concept` | Broad concept search across all products, returns 8 top results. |
 | `list_wso2_products` | Returns all supported products with IDs and base URLs. |
 
