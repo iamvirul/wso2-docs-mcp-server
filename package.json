@@ -68,7 +68,7 @@
         "@types/pg": "^8.11.6",
         "@vitest/coverage-v8": "^4.0.18",
         "tsx": "^4.15.0",
-        "typescript": "^5.5.0",
+        "typescript": "^6.0.3",
         "vitest": "^4.0.18"
     },
     "engines": {
