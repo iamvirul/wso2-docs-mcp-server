@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="760" viewBox="0 0 920 760" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+<defs>
+  <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#6e7781"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="920" height="760" rx="10" fill="#ffffff" stroke="#e1e4e8" stroke-width="1"/>
+<text x="460" y="30" text-anchor="middle" font-size="14" font-weight="600" fill="#24292f">WSO2 Docs MCP Server  System Architecture</text>
+<rect x="20" y="44" width="444" height="122" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1.5"/>
+<text x="34" y="60" text-anchor="start" font-size="8.5" font-weight="600" fill="#57606a" letter-spacing="0.3">DOCUMENTATION SOURCES  (GitHub-native, Git Trees API)</text>
+<rect x="476" y="44" width="424" height="122" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1.5"/>
+<text x="490" y="60" text-anchor="start" font-size="8.5" font-weight="600" fill="#57606a" letter-spacing="0.3">DOCUMENTATION SOURCES  (Web crawl)</text>
+<rect x="34" y="70" width="78" height="82" rx="6" fill="#24292f" stroke="#444c56" stroke-width="1.5"/>
+<text x="73" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">wso2/</text>
+<text x="73" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">docs-apim</text>
+<rect x="119" y="70" width="78" height="82" rx="6" fill="#24292f" stroke="#444c56" stroke-width="1.5"/>
+<text x="158" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">wso2/</text>
+<text x="158" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">docs-mi</text>
+<rect x="204" y="70" width="78" height="82" rx="6" fill="#24292f" stroke="#444c56" stroke-width="1.5"/>
+<text x="243" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">wso2/</text>
+<text x="243" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">docs-bi</text>
+<rect x="289" y="70" width="78" height="82" rx="6" fill="#24292f" stroke="#444c56" stroke-width="1.5"/>
+<text x="328" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">wso2/</text>
+<text x="328" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">docs-choreo-dev</text>
+<rect x="374" y="70" width="78" height="82" rx="6" fill="#24292f" stroke="#444c56" stroke-width="1.5"/>
+<text x="413" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">wso2/</text>
+<text x="413" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">docs-is</text>
+<rect x="490" y="70" width="180" height="82" rx="6" fill="#1b1f24" stroke="#444c56" stroke-width="1.5"/>
+<text x="580" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">ballerina.io</text>
+<text x="580" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">/learn</text>
+<rect x="686" y="70" width="180" height="82" rx="6" fill="#1b1f24" stroke="#444c56" stroke-width="1.5"/>
+<text x="776" y="106" text-anchor="middle" font-size="10" font-weight="600" fill="#cdd9e5">wso2.com</text>
+<text x="776" y="120" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#8b949e">/library</text>
+<rect x="20" y="186" width="880" height="192" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1.5"/>
+<text x="34" y="202" text-anchor="start" font-size="8.5" font-weight="600" fill="#57606a" letter-spacing="0.3">INGESTION PIPELINE</text>
+<rect x="36" y="214" width="200" height="66" rx="6" fill="#0969da" stroke="#0969da" stroke-width="1.5"/>
+<text x="136" y="242" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">GitHubDocFetcher</text>
+<text x="136" y="256" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">Git Trees API  (1 call per repo)</text>
+<line x1="240" y1="247" x2="254" y2="247" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="258" y="214" width="178" height="66" rx="6" fill="#0969da" stroke="#0969da" stroke-width="1.5"/>
+<text x="347" y="242" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">MarkdownParser</text>
+<text x="347" y="256" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">front-matter  sections  headings</text>
+<rect x="496" y="214" width="168" height="66" rx="6" fill="#6e40c9" stroke="#6e40c9" stroke-width="1.5"/>
+<text x="580" y="242" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">DocCrawler</text>
+<text x="580" y="256" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">sitemap  HTML scraping</text>
+<line x1="668" y1="247" x2="682" y2="247" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="686" y="214" width="168" height="66" rx="6" fill="#6e40c9" stroke="#6e40c9" stroke-width="1.5"/>
+<text x="770" y="242" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">DocParser</text>
+<text x="770" y="256" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">Cheerio HTML  structured text</text>
+<line x1="136" y1="170" x2="136" y2="182" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<line x1="580" y1="170" x2="580" y2="182" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<line x1="347" y1="284" x2="347" y2="300" stroke="#6e7781" stroke-width="1.6"/>
+<line x1="770" y1="284" x2="770" y2="300" stroke="#6e7781" stroke-width="1.6"/>
+<line x1="347" y1="300" x2="770" y2="300" stroke="#6e7781" stroke-width="1.6"/>
+<circle cx="347" cy="300" r="3" fill="#6e7781"/>
+<circle cx="770" cy="300" r="3" fill="#6e7781"/>
+<circle cx="558" cy="300" r="3" fill="#6e7781"/>
+<line x1="558" y1="304" x2="558" y2="316" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="278" y="320" width="560" height="44" rx="6" fill="#1f6feb" stroke="#1f6feb" stroke-width="1.5"/>
+<text x="558" y="337" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">DocChunker</text>
+<text x="558" y="351" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">800-token semantic splits with 100-token overlap</text>
+<rect x="20" y="400" width="880" height="98" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1.5"/>
+<text x="34" y="416" text-anchor="start" font-size="8.5" font-weight="600" fill="#57606a" letter-spacing="0.3">VECTORIZATION &amp; STORAGE</text>
+<line x1="558" y1="382" x2="558" y2="396" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="36" y="422" width="484" height="60" rx="6" fill="#0a3069" stroke="#0a3069" stroke-width="1.5"/>
+<text x="278" y="447" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">EmbeddingProvider</text>
+<text x="278" y="461" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">Ollama  |  HuggingFace ONNX (fallback)  |  OpenAI  |  Gemini  |  Voyage</text>
+<line x1="524" y1="452" x2="538" y2="452" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="542" y="422" width="324" height="60" rx="6" fill="#5a32a3" stroke="#7c3aed" stroke-width="1.5"/>
+<text x="704" y="447" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">pgvector (PostgreSQL)</text>
+<text x="704" y="461" text-anchor="middle" font-size="8.5" font-weight="normal" fill="#adbac7">cosine similarity  TTL query cache</text>
+<rect x="20" y="520" width="880" height="80" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1.5"/>
+<text x="34" y="536" text-anchor="start" font-size="8.5" font-weight="600" fill="#57606a" letter-spacing="0.3">MCP SERVER  (stdio transport)</text>
+<line x1="278" y1="502" x2="278" y2="516" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<line x1="704" y1="502" x2="704" y2="516" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="34" y="538" width="204" height="50" rx="6" fill="#2da44e" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="136" y="567" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">search_wso2_docs</text>
+<rect x="250" y="538" width="204" height="50" rx="6" fill="#2da44e" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="352" y="567" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">get_wso2_guide</text>
+<rect x="466" y="538" width="204" height="50" rx="6" fill="#2da44e" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="568" y="567" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">explain_wso2_concept</text>
+<rect x="682" y="538" width="204" height="50" rx="6" fill="#2da44e" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="784" y="567" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">list_wso2_products</text>
+<rect x="20" y="622" width="880" height="96" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1.5"/>
+<text x="34" y="638" text-anchor="start" font-size="8.5" font-weight="600" fill="#57606a" letter-spacing="0.3">AI CLIENTS  (MCP stdio protocol)</text>
+<line x1="460" y1="618" x2="460" y2="604" stroke="#6e7781" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="34" y="640" width="204" height="62" rx="6" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.5"/>
+<text x="136" y="675" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">Claude Desktop</text>
+<rect x="250" y="640" width="204" height="62" rx="6" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.5"/>
+<text x="352" y="675" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">Claude Code</text>
+<rect x="466" y="640" width="204" height="62" rx="6" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.5"/>
+<text x="568" y="675" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">Cursor</text>
+<rect x="682" y="640" width="204" height="62" rx="6" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.5"/>
+<text x="784" y="675" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">VS Code</text>
+<line x1="60" y1="736" x2="860" y2="736" stroke="#d1d9e0" stroke-width="1"/>
+<text x="460" y="754" text-anchor="middle" font-size="9" font-weight="normal" fill="#8c959f">github.com / iamvirul / wso2-docs-mcp-server</text>
+</svg>

@@ -11,62 +11,7 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    subgraph Sources ["Documentation Sources (GitHub-native)"]
-        S1["wso2/docs-apim"]
-        S2["wso2/docs-mi"]
-        S3["wso2/docs-bi"]
-        S4["wso2/docs-choreo-dev"]
-        S5["wso2/docs-is"]
-    end
-
-    subgraph WebSources ["Documentation Sources (Web Crawl)"]
-        W1["ballerina.io"]
-        W2["wso2.com/library"]
-    end
-
-    subgraph Ingestion ["Ingestion Pipeline"]
-        GF["GitHubDocFetcher\nGit Trees API — one call per repo"]
-        WC["DocCrawler\nSitemap + Cheerio HTML scraping"]
-        MP["MarkdownParser\nFront-matter · headings · sections"]
-        HP["DocParser\nCheerio HTML → structured text"]
-        CK["DocChunker\n~800 token semantic splits with overlap"]
-    end
-
-    subgraph VectorStore ["Embedding & Storage"]
-        EM["EmbeddingProvider\nOllama · HuggingFace ONNX · OpenAI · Gemini · Voyage"]
-        PG[("pgvector\nPostgreSQL")]
-    end
-
-    subgraph Server ["MCP Server  stdio"]
-        T1["search_wso2_docs"]
-        T2["get_wso2_guide"]
-        T3["explain_wso2_concept"]
-        T4["list_wso2_products"]
-    end
-
-    subgraph Clients ["AI Clients"]
-        C1["Claude Desktop"]
-        C2["Claude Code"]
-        C3["Cursor"]
-        C4["VS Code"]
-    end
-
-    S1 & S2 & S3 & S4 & S5 --> GF
-    W1 & W2 --> WC
-
-    GF -->|"Raw Markdown"| MP
-    WC -->|"HTML"| HP
-
-    MP & HP -->|"ParsedDoc"| CK
-    CK -->|"DocChunk[]"| EM
-    EM -->|"float[] vectors"| PG
-
-    C1 & C2 & C3 & C4 -->|"MCP tool call"| T1 & T2 & T3
-    T1 & T2 & T3 -->|"embed → cosine search"| PG
-    PG -->|"top-k chunks"| T1 & T2 & T3
-```
+![System Architecture](docs/architecture.svg)
 
 ## Documentation Sources
 
