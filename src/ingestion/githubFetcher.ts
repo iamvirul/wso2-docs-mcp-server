@@ -45,6 +45,8 @@ export class GitHubDocFetcher {
     private static readonly SKIP_PATTERNS = [
         '/assets/', '/images/', '/img/', '/static/',
         '/includes/', '/overrides/', '/theme/',
+        // /apis/ dirs in docs-is contain only <redoc> template wrappers, no narrative text
+        '/apis/',
         'page-not-found', 'index.md',
     ];
 
