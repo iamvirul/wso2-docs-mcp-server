@@ -11,7 +11,7 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 
 ## Architecture
 
-![System Architecture](docs/architecture.svg)
+![System Architecture](https://raw.githubusercontent.com/iamvirul/wso2-docs-mcp-server/main/docs/architecture.svg)
 
 ## Documentation Sources
 
