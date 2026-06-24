@@ -6,9 +6,9 @@
     "type": "module",
     "main": "dist/src/index.js",
     "bin": {
-        "wso2-docs-mcp-server": "./dist/src/index.js",
-        "wso2-docs-crawl": "./dist/scripts/crawl.js",
-        "wso2-docs-migrate": "./dist/scripts/migrate.js"
+        "wso2-docs-mcp-server": "dist/src/index.js",
+        "wso2-docs-crawl": "dist/scripts/crawl.js",
+        "wso2-docs-migrate": "dist/scripts/migrate.js"
     },
     "files": [
         "dist",
@@ -22,7 +22,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/iamvirul/wso2-docs-mcp-server"
+        "url": "git+https://github.com/iamvirul/wso2-docs-mcp-server.git"
     },
     "keywords": [
         "mcp",
