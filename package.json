@@ -54,7 +54,7 @@
         "@modelcontextprotocol/sdk": "^1.5.0",
         "axios": "^1.6.8",
         "cheerio": "^1.0.0",
-        "commander": "^12.1.0",
+        "commander": "^15.0.0",
         "dotenv": "^16.4.5",
         "node-cron": "^4.5.0",
         "openai": "^4.52.0",
