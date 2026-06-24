@@ -29,8 +29,8 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 
 - **Node.js** ≥ 20
 - **Docker** (for pgvector)
-- **Embeddings** — no API key required by default:
-  - **[Ollama](https://ollama.com)** (recommended) — runs locally, model auto-downloaded on first run
+- **Embeddings** - no API key required by default:
+  - **[Ollama](https://ollama.com)** (recommended) - runs locally, model auto-downloaded on first run
   - If Ollama is not running, the server automatically falls back to **HuggingFace ONNX** (in-process, also downloads automatically)
   - Cloud providers are also supported: OpenAI, Google Gemini, Voyage AI
 
@@ -40,8 +40,8 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 
 Choose the setup path that fits your use case:
 
-- **[Install from npm](#install-from-npm)** — simplest, no cloning required
-- **[Clone and build](#clone-and-build)** — for development or contributions
+- **[Install from npm](#install-from-npm)** - simplest, no cloning required
+- **[Clone and build](#clone-and-build)** - for development or contributions
 
 ---
 
@@ -53,7 +53,7 @@ Install the package globally to get the `wso2-docs-mcp-server`, `wso2-docs-crawl
 npm install -g wso2-docs-mcp-server
 ```
 
-> **Prefer no global install?** You can use `npx wso2-docs-mcp-server`, `npx wso2-docs-crawl`, and `npx wso2-docs-migrate` in every step below — just replace the bare command with its `npx` equivalent.
+> **Prefer no global install?** You can use `npx wso2-docs-mcp-server`, `npx wso2-docs-crawl`, and `npx wso2-docs-migrate` in every step below - just replace the bare command with its `npx` equivalent.
 
 #### 1. Start pgvector
 
@@ -73,7 +73,7 @@ ollama pull nomic-embed-text
 ollama serve
 ```
 
-> **No Ollama?** Skip this step. The server automatically falls back to HuggingFace ONNX — model downloads on first use with no extra setup.
+> **No Ollama?** Skip this step. The server automatically falls back to HuggingFace ONNX - model downloads on first use with no extra setup.
 
 #### 3. Run database migration
 
@@ -104,9 +104,9 @@ Available product IDs: `apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library
 
 #### 5. Configure your AI client
 
-The MCP server is launched on demand by your AI client — no background process needed.
+The MCP server is launched on demand by your AI client - no background process needed.
 
-**Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+**Claude Desktop** - edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -122,7 +122,7 @@ The MCP server is launched on demand by your AI client — no background process
 }
 ```
 
-**Claude Code** — run once in your terminal:
+**Claude Code** - run once in your terminal:
 
 ```bash
 claude mcp add wso2-docs \
@@ -135,7 +135,7 @@ claude mcp add wso2-docs \
 claude mcp list
 ```
 
-**Cursor** — create `.cursor/mcp.json` in your project root:
+**Cursor** - create `.cursor/mcp.json` in your project root:
 
 ```json
 {
@@ -151,7 +151,7 @@ claude mcp list
 }
 ```
 
-**VS Code** — create `.vscode/mcp.json`:
+**VS Code** - create `.vscode/mcp.json`:
 
 ```json
 {
@@ -192,7 +192,7 @@ npm install
 ollama serve
 ```
 
-> **No Ollama?** Skip this step. The server detects Ollama is not running and automatically falls back to HuggingFace ONNX inference — the model downloads on first use with no extra setup.
+> **No Ollama?** Skip this step. The server detects Ollama is not running and automatically falls back to HuggingFace ONNX inference - the model downloads on first use with no extra setup.
 
 #### 3. Configure environment
 
@@ -247,7 +247,7 @@ npm run dev
 
 > Replace `/ABSOLUTE/PATH/TO/wso2-docs-mcp-server` with your actual clone path.
 
-**Claude Desktop** — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+**Claude Desktop** - edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -279,9 +279,9 @@ claude mcp list
 
 See `config-examples/claude_code.sh` for a convenience script.
 
-**Cursor** — create `.cursor/mcp.json` — see `config-examples/cursor_mcp.json`.
+**Cursor** - create `.cursor/mcp.json` - see `config-examples/cursor_mcp.json`.
 
-**VS Code** — create `.vscode/mcp.json` — see `config-examples/vscode_mcp.json`.
+**VS Code** - create `.vscode/mcp.json` - see `config-examples/vscode_mcp.json`.
 
 ---
 
@@ -347,7 +347,7 @@ q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~1
 
 > **Note:** For small crawls (≤ 10 pages) total wall-clock time is dominated by network I/O
 > (HTTPS fetches to docs sites), so the end-to-end improvement is modest. The embedding
-> speedup becomes significant at scale — crawling 500+ pages where embedding previously
+> speedup becomes significant at scale - crawling 500+ pages where embedding previously
 > accounted for hours of runtime. For best crawl performance, run Ollama (`ollama serve`)
 > which parallelises inference natively and has no per-chunk overhead.
 
@@ -359,7 +359,7 @@ q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~1
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | — | PostgreSQL connection string (required) |
+| `DATABASE_URL` | - | PostgreSQL connection string (required) |
 | `EMBEDDING_PROVIDER` | `ollama` | `ollama` \| `openai` \| `gemini` \| `voyage` |
 | `EMBEDDING_DIMENSIONS` | `768` | Must match model output dimensions |
 | `CRAWL_CONCURRENCY` | `5` | Concurrent HTTP requests during crawl |
@@ -380,11 +380,11 @@ q8  ARM NEON:          ~9 ms/chunk   (68 chunks ≈  0.6 s of embedding)  ← ~1
 
 | Variable | Default | Description |
 |---|---|---|
-| `OPENAI_API_KEY` | — | Required if `EMBEDDING_PROVIDER=openai` |
+| `OPENAI_API_KEY` | - | Required if `EMBEDDING_PROVIDER=openai` |
 | `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI model |
-| `GEMINI_API_KEY` | — | Required if `EMBEDDING_PROVIDER=gemini` |
+| `GEMINI_API_KEY` | - | Required if `EMBEDDING_PROVIDER=gemini` |
 | `GEMINI_EMBEDDING_MODEL` | `text-embedding-004` | Gemini model |
-| `VOYAGE_API_KEY` | — | Required if `EMBEDDING_PROVIDER=voyage` |
+| `VOYAGE_API_KEY` | - | Required if `EMBEDDING_PROVIDER=voyage` |
 | `VOYAGE_EMBEDDING_MODEL` | `voyage-3` | Voyage model |
 
 ### Embedding dimension reference

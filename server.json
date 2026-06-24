@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.iamvirul/wso2-docs-mcp-server",
-  "description": "Semantic search over WSO2 docs (APIM, MI, Choreo, Ballerina) via RAG and pgvector.",
+  "description": "Semantic search over WSO2 docs (APIM, IS, MI, Choreo, Ballerina) via RAG and pgvector.",
   "repository": {
     "url": "https://github.com/iamvirul/wso2-docs-mcp-server",
     "source": "github"
   },
-  "version": "1.2.0",
+  "version": "1.3.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "wso2-docs-mcp-server",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "transport": {
         "type": "stdio"
       },
