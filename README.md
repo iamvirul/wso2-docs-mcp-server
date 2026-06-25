@@ -3,6 +3,8 @@
 [![npm version](https://img.shields.io/npm/v/wso2-docs-mcp-server.svg)](https://www.npmjs.com/package/wso2-docs-mcp-server)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
+>"This is an unofficial community project. Not affiliated with or endorsed by WSO2."
+
 A production-ready **Model Context Protocol (MCP)** server that provides AI assistants (Claude Desktop, Claude Code, Cursor, VS Code) with semantic search over WSO2 documentation via Retrieval-Augmented Generation (RAG).
 
 Under the hood, it uses a blazing-fast dual-ingestion engine:
