@@ -116,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ONNX Runtime native thread conflict with concurrent HTTP+gzip threads (mutex lock failed / SIGABRT at exit code 134) — resolved by deferring provider initialization to after all network I/O completes
 - MCP server entry point path corrected (`dist/src/index.js` not `dist/index.js`) due to `tsconfig.json` `rootDir: "."`
 
+[1.3.1]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.0.0...v1.1.0
