@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-06-29
+
+### Changed
+
+- **README**: Added project disclaimer and additional detail sections to README.md.
+- **LICENSE**: Updated copyright year and owner.
+
+### Fixed
+
+- **package.json**: Resolved npm pkg lint warnings surfaced by `npm pkg fix`.
+
+### Dependencies
+
+- **openai** `6.44.0` -> `6.45.0`
+- **@types/node** `26.0.0` -> `26.0.1`
+
 ## [1.3.0] - 2026-06-25
 
 ### Added
