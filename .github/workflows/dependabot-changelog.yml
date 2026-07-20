@@ -138,6 +138,8 @@ jobs:
           EOF
 
       - name: Commit and push
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -149,5 +151,5 @@ jobs:
           fi
 
           git add CHANGELOG.md
-          git commit -m "chore(changelog): update dependencies [${{ github.event.pull_request.title }}]"
+          git commit -m "chore(changelog): update dependencies [$PR_TITLE]"
           git push
