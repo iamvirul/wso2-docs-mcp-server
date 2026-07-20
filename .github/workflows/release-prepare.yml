@@ -1,0 +1,125 @@
+name: Prepare Release
+
+# Manually bump the version, update CHANGELOG.md, and push a version tag.
+# The tag push then triggers the `release.yml` workflow which handles
+# build, npm publish, and GitHub Release creation.
+#
+# Prerequisites:
+#   RELEASE_PAT – a Personal Access Token with `repo` scope stored as a
+#   repository secret. The default GITHUB_TOKEN cannot trigger downstream
+#   workflow runs (release.yml) on the tag it creates, but a PAT can.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Semver increment to apply"
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  prepare-release:
+    name: Bump version, update changelog, and tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          # PAT required so the tag push triggers release.yml
+          token: ${{ secrets.RELEASE_PAT }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Bump version in package.json
+        id: version
+        run: |
+          # npm version writes the new version to stdout and updates package.json.
+          # --no-git-tag-version prevents npm from creating a commit/tag itself.
+          NEW_VERSION=$(npm version ${{ inputs.version_bump }} --no-git-tag-version)
+          # npm version output includes the "v" prefix — strip it for changelog use.
+          NEW_VERSION="${NEW_VERSION#v}"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Bumped to $NEW_VERSION"
+
+      - name: Update CHANGELOG.md
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          node --input-type=module << 'EOF'
+          import { readFileSync, writeFileSync } from 'fs';
+
+          const newVersion = process.env.NEW_VERSION;
+          const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+          const UNRELEASED = '## [Unreleased]';
+          const NEW_HEADER = `## [${newVersion}] - ${today}`;
+          const REPO = 'https://github.com/iamvirul/wso2-docs-mcp-server';
+
+          let changelog = readFileSync('CHANGELOG.md', 'utf-8');
+
+          // Rename [Unreleased] to the new versioned header, or prepend it
+          if (changelog.includes(UNRELEASED)) {
+            changelog = changelog.replace(UNRELEASED, NEW_HEADER);
+          } else {
+            const firstVer = changelog.match(/\n## \[/);
+            if (firstVer) {
+              const insertAt = firstVer.index + 1;
+              changelog =
+                changelog.slice(0, insertAt) + NEW_HEADER + '\n\n' + changelog.slice(insertAt);
+            } else {
+              changelog = changelog.trimEnd() + '\n\n' + NEW_HEADER + '\n';
+            }
+          }
+
+          // Determine the previous version for the comparison link
+          const prevMatch = changelog.match(/## \[(\d+\.\d+\.\d+)\]/);
+          const prevVersion = prevMatch ? prevMatch[1] : null;
+
+          const comparisonLink = prevVersion
+            ? `[${newVersion}]: ${REPO}/compare/v${prevVersion}...v${newVersion}`
+            : `[${newVersion}]: ${REPO}/releases/tag/v${newVersion}`;
+
+          // Insert the new comparison link before the first existing link line
+          const firstLink = changelog.match(/\n\[\d/);
+          if (firstLink) {
+            const insertAt = firstLink.index + 1;
+            changelog =
+              changelog.slice(0, insertAt) + comparisonLink + '\n' + changelog.slice(insertAt);
+          } else {
+            changelog = changelog.trimEnd() + '\n' + comparisonLink + '\n';
+          }
+
+          writeFileSync('CHANGELOG.md', changelog);
+          console.log(`CHANGELOG.md: promoted [Unreleased] -> [${newVersion}] - ${today}`);
+          EOF
+
+      - name: Commit, tag, and push
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore(release): v${NEW_VERSION}"
+
+          git tag "v${NEW_VERSION}" -m "Release v${NEW_VERSION}"
+
+          # Push commit and tag; the tag triggers release.yml
+          git push origin main --follow-tags

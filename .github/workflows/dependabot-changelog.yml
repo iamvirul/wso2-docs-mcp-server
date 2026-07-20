@@ -1,0 +1,153 @@
+name: Update Changelog (Dependabot)
+
+# Runs after a Dependabot PR is merged into main.
+# Parses the PR title/body to extract dependency changes and appends them
+# to the [Unreleased] section of CHANGELOG.md, creating it if absent.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog:
+    name: Append dependency entries to CHANGELOG.md
+    # Only run when the PR was actually merged and the author is Dependabot
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Checkout the commit that was just merged into main
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Parse dependency changes and update CHANGELOG.md
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        # Single-quoted EOF delimiter: bash passes the heredoc content to node
+        # literally — no variable expansion, so JS template literals are safe.
+        run: |
+          node --input-type=module << 'EOF'
+          import { readFileSync, writeFileSync } from 'fs';
+
+          const prTitle = process.env.PR_TITLE ?? '';
+          const prBody  = process.env.PR_BODY  ?? '';
+
+          const entries = [];
+
+          // Pattern 1 – markdown table (grouped PRs, newer Dependabot format)
+          // | [pkg-name](url) | `1.0.0` | `2.0.0` |
+          const tableRe = /\|\s*\[([^\]]+)\]\([^)]+\)\s*\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|/g;
+          let m;
+          while ((m = tableRe.exec(prBody)) !== null) {
+            entries.push(`- **${m[1]}** \`${m[2]}\` -> \`${m[3]}\``);
+          }
+
+          // Pattern 2 – inline "Updates `pkg` from `X` to `Y`" lines
+          if (entries.length === 0) {
+            const inlineRe = /[Uu]pdates?\s+`([^`]+)`\s+from\s+`([^`]+)`\s+to\s+`([^`]+)`/g;
+            while ((m = inlineRe.exec(prBody)) !== null) {
+              entries.push(`- **${m[1]}** \`${m[2]}\` -> \`${m[3]}\``);
+            }
+          }
+
+          // Pattern 3 – single-package PR title fallback
+          // "chore(deps): bump openai from 6.44.0 to 6.45.0"
+          // "chore(ci)(deps): bump actions/checkout from v4 to v7"
+          if (entries.length === 0) {
+            const titleMatch = prTitle.match(/bump\s+(.+?)\s+from\s+(\S+)\s+to\s+(\S+)$/i);
+            if (titleMatch) {
+              entries.push(`- **${titleMatch[1]}** \`${titleMatch[2]}\` -> \`${titleMatch[3]}\``);
+            }
+          }
+
+          if (entries.length === 0) {
+            console.log('No dependency entries parsed from PR — skipping changelog update.');
+            process.exit(0);
+          }
+
+          const entryBlock = entries.join('\n');
+          console.log('Entries to append:\n' + entryBlock);
+
+          // ── Changelog manipulation ──────────────────────────────────────────
+          const UNRELEASED = '## [Unreleased]';
+          const DEPS_SECTION = '### Dependencies';
+
+          let changelog = readFileSync('CHANGELOG.md', 'utf-8');
+
+          if (changelog.includes(UNRELEASED)) {
+            const uStart = changelog.indexOf(UNRELEASED);
+            // Locate where the next versioned section begins (the tail)
+            const nextVerIdx = changelog.indexOf('\n## [', uStart + UNRELEASED.length);
+            const block = nextVerIdx === -1
+              ? changelog.slice(uStart)
+              : changelog.slice(uStart, nextVerIdx);
+            const tail = nextVerIdx === -1 ? '' : changelog.slice(nextVerIdx);
+
+            if (block.includes(DEPS_SECTION)) {
+              // Append inside the existing ### Dependencies subsection
+              const dIdx = block.indexOf(DEPS_SECTION);
+              const nextSub = block.indexOf('\n### ', dIdx + DEPS_SECTION.length);
+              if (nextSub === -1) {
+                // Deps is the last subsection in [Unreleased]
+                changelog = changelog.slice(0, uStart)
+                  + block.trimEnd() + '\n' + entryBlock + '\n'
+                  + tail;
+              } else {
+                changelog = changelog.slice(0, uStart)
+                  + block.slice(0, nextSub).trimEnd() + '\n' + entryBlock + '\n'
+                  + block.slice(nextSub)
+                  + tail;
+              }
+            } else {
+              // No Dependencies subsection yet — add one at the end of [Unreleased]
+              changelog = changelog.slice(0, uStart)
+                + block.trimEnd() + '\n\n' + DEPS_SECTION + '\n\n' + entryBlock + '\n'
+                + tail;
+            }
+          } else {
+            // No [Unreleased] section — insert one before the first versioned entry
+            const firstVer = changelog.match(/\n## \[/);
+            if (firstVer) {
+              const insertAt = firstVer.index + 1;
+              changelog =
+                changelog.slice(0, insertAt)
+                + UNRELEASED + '\n\n' + DEPS_SECTION + '\n\n' + entryBlock + '\n\n'
+                + changelog.slice(insertAt);
+            } else {
+              changelog =
+                changelog.trimEnd()
+                + '\n\n' + UNRELEASED + '\n\n' + DEPS_SECTION + '\n\n' + entryBlock + '\n';
+            }
+          }
+
+          writeFileSync('CHANGELOG.md', changelog);
+          console.log('CHANGELOG.md updated successfully.');
+          EOF
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Only commit if CHANGELOG.md actually changed
+          if git diff --quiet CHANGELOG.md; then
+            echo "No changelog changes to commit."
+            exit 0
+          fi
+
+          git add CHANGELOG.md
+          git commit -m "chore(changelog): update dependencies [${{ github.event.pull_request.title }}]"
+          git push
