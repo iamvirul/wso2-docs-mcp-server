@@ -27,6 +27,7 @@ jobs:
           # Checkout the commit that was just merged into main
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - uses: actions/setup-node@v6
         with:
@@ -43,7 +44,11 @@ jobs:
           import { readFileSync, writeFileSync } from 'fs';
 
           const prTitle = process.env.PR_TITLE ?? '';
-          const prBody  = process.env.PR_BODY  ?? '';
+          // Trim at the first <details> block — Dependabot embeds package changelogs
+          // and release notes there, which can produce false regex matches.
+          const rawBody = process.env.PR_BODY ?? '';
+          const detailsIdx = rawBody.indexOf('<details>');
+          const prBody = detailsIdx === -1 ? rawBody : rawBody.slice(0, detailsIdx);
 
           const entries = [];
 
@@ -140,9 +145,12 @@ jobs:
       - name: Commit and push
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Explicit token URL required because persist-credentials is false
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
 
           # Only commit if CHANGELOG.md actually changed
           if git diff --quiet CHANGELOG.md; then
@@ -151,5 +159,5 @@ jobs:
           fi
 
           git add CHANGELOG.md
-          git commit -m "chore(changelog): update dependencies [$PR_TITLE]"
+          git commit -m "chore(changelog): update dependencies [${PR_TITLE}]"
           git push

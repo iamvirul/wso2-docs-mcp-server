@@ -73,6 +73,11 @@ jobs:
 
           let changelog = readFileSync('CHANGELOG.md', 'utf-8');
 
+          // Capture the previous version BEFORE rewriting the header — after the
+          // rename, the first version match would be the new version itself.
+          const prevMatch = changelog.match(/## \[(\d+\.\d+\.\d+)\]/);
+          const prevVersion = prevMatch ? prevMatch[1] : null;
+
           // Rename [Unreleased] to the new versioned header, or prepend it
           if (changelog.includes(UNRELEASED)) {
             changelog = changelog.replace(UNRELEASED, NEW_HEADER);
@@ -86,10 +91,6 @@ jobs:
               changelog = changelog.trimEnd() + '\n\n' + NEW_HEADER + '\n';
             }
           }
-
-          // Determine the previous version for the comparison link
-          const prevMatch = changelog.match(/## \[(\d+\.\d+\.\d+)\]/);
-          const prevVersion = prevMatch ? prevMatch[1] : null;
 
           const comparisonLink = prevVersion
             ? `[${newVersion}]: ${REPO}/compare/v${prevVersion}...v${newVersion}`
