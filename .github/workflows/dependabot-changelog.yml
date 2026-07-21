@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-changelog:
@@ -142,22 +143,34 @@ jobs:
           console.log('CHANGELOG.md updated successfully.');
           EOF
 
-      - name: Commit and push
+      - name: Open PR with changelog update
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Explicit token URL required because persist-credentials is false
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
-
-          # Only commit if CHANGELOG.md actually changed
           if git diff --quiet CHANGELOG.md; then
             echo "No changelog changes to commit."
             exit 0
           fi
 
+          BRANCH="chore/changelog-dependabot-${PR_NUMBER}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+
+          git checkout -b "${BRANCH}"
           git add CHANGELOG.md
           git commit -m "chore(changelog): update dependencies [${PR_TITLE}]"
-          git push
+          git push origin "${BRANCH}"
+
+          gh pr create \
+            --title "chore(changelog): update dependencies [${PR_TITLE}]" \
+            --body "Automated changelog update for merged Dependabot PR #${PR_NUMBER}." \
+            --base main \
+            --head "${BRANCH}"
+
+          # Auto-merge once required checks pass; silently skipped if the repo
+          # does not have auto-merge enabled in Settings → General.
+          gh pr merge --auto --squash || true
