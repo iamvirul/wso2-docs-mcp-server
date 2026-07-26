@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.4] - 2026-07-26
 
 ### Dependencies
 
@@ -149,6 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ONNX Runtime native thread conflict with concurrent HTTP+gzip threads (mutex lock failed / SIGABRT at exit code 134) — resolved by deferring provider initialization to after all network I/O completes
 - MCP server entry point path corrected (`dist/src/index.js` not `dist/index.js`) due to `tsconfig.json` `rootDir: "."`
 
+[1.3.4]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.0...v1.3.1
