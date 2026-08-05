@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - **ip-address** `10.2.0` -> `10.4.0`
+- **@hono/node-server** `1.19.14` -> `2.1.0`
 
 ## [1.3.6] - 2026-08-03
 
