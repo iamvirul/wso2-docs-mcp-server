@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - **postcss** `8.5.18` -> `8.5.25`
+- **fast-uri** `3.1.4` -> `3.1.5`
 
 ## [1.3.7] - 2026-08-05
 
