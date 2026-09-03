@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Dependencies
 
+- **qs** `6.15.2` -> `6.16.0`
 - **fast-uri** `3.1.5` -> `3.1.7`
 
 ## [1.3.10] - 2026-08-31
