@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - **dotenv** `17.4.2` -> `18.0.0`
+- **ip-address** `10.4.0` -> `10.7.3`
 
 ## [1.3.12] - 2026-09-16
 
