@@ -48,7 +48,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
-        "test:ci": "vitest run --coverage --reporter=verbose"
+        "test:ci": "vitest run --coverage --reporter=verbose",
+        "test:smoke": "tsx tests/e2e/smoke.ts"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",

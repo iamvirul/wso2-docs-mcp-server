@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- CI **Package Smoke Test** job: packs and installs the tarball into a clean project, runs migrations against a real pgvector Postgres, then drives the installed MCP server over stdio (tools/list, list_wso2_products, a real embedding + vector search, input validation). Run locally with `npm run test:smoke`.
+
 ### Fixed
 
 - Published package crashed on startup with `ERR_MODULE_NOT_FOUND`: compiled ESM output used extensionless relative imports. Switched to `NodeNext` module resolution and added explicit `.js` extensions.
