@@ -7,11 +7,13 @@ on:
 
 permissions:
   contents: write
-  # GitHub OIDC token for MCP Registry authentication (io.github.<owner>/* namespace)
+  # GitHub OIDC token for npm trusted publishing (with provenance) and
+  # MCP Registry authentication (io.github.<owner>/* namespace)
   id-token: write
 
 env:
   MCP_PUBLISHER_VERSION: v1.8.1
+  NPM_CLI_VERSION: 11.21.1
 
 jobs:
   release:
@@ -49,20 +51,25 @@ jobs:
             if (bad.length) { console.error(`server.json versions ${bad} != package.json ${v}`); process.exit(1); }
           ' "$PKG_VERSION"
 
-      # Skips when the version is already on npm, so a failed run can be re-run
-      # after a manual publish without failing here.
+      # Trusted publishing (OIDC) needs npm >= 11.5.1; Node 22 bundles npm 10.
+      # No NPM_TOKEN: npm deprecated publishing with 2FA-bypass tokens (Jan 2027).
+      # Requires a Trusted Publisher on npmjs.com for this repo + release.yml.
+      - name: Install npm with trusted publishing support
+        run: npm install -g npm@${NPM_CLI_VERSION}
+
+      # Skips when the version is already on npm, so a failed run can be re-run.
+      # Only E404 means "not published"; any other lookup error fails the step.
       - name: Publish to NPM
         run: |
           PKG="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
-          if npm view "$PKG" version >/dev/null 2>&1; then
+          if OUT=$(npm view "$PKG" version 2>&1); then
             echo "$PKG already published — skipping."
-          else
+          elif grep -q "E404" <<< "$OUT"; then
             npm publish --access public
+          else
+            echo "::error::Could not check $PKG on npm: $OUT"
+            exit 1
           fi
-        env:
-          # Must be a granular token with "Bypass two-factor authentication" enabled,
-          # otherwise npm rejects CI publishes with EOTP.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # The MCP Registry (and marketplaces that import from it) only see new
       # versions once server.json is published there.
