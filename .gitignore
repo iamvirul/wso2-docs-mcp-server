@@ -31,4 +31,4 @@ scripts/*.d.ts
 scripts/*.d.ts.map
 
 coverage/
-
+graphify-out/*
