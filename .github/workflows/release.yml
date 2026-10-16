@@ -66,8 +66,19 @@ jobs:
 
       # The MCP Registry (and marketplaces that import from it) only see new
       # versions once server.json is published there.
+      # The registry rejects duplicate versions, so skip when this version is
+      # already there (re-runs). Any status other than 200/404 fails the step.
       - name: Publish to MCP Registry
         run: |
+          NAME=$(node -p "require('./server.json').name")
+          VERSION=$(node -p "require('./server.json').version")
+          URL="https://registry.modelcontextprotocol.io/v0/servers/$(node -p "encodeURIComponent('$NAME')")/versions/${VERSION}"
+          STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 "$URL")
+          case "$STATUS" in
+            200) echo "$NAME@$VERSION already in MCP Registry — skipping."; exit 0 ;;
+            404) ;;
+            *) echo "::error::Unexpected HTTP $STATUS checking $URL"; exit 1 ;;
+          esac
           curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" \
             | tar xz mcp-publisher
           ./mcp-publisher login github-oidc
