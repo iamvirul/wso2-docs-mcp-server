@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Published package crashed on startup with `ERR_MODULE_NOT_FOUND`: compiled ESM output used extensionless relative imports. Switched to `NodeNext` module resolution and added explicit `.js` extensions.
+- Startup failures caused by connection errors (e.g. `ECONNREFUSED`) now print the error code instead of an empty message.
+
+### Security
+
+- Raised minimum versions so vulnerable releases can no longer satisfy the declared ranges:
+  - **@modelcontextprotocol/sdk** `^1.5.0` -> `^1.32.1` (GHSA-6qxp-vccf-f47h, GHSA-345p-7cg4-v4c7, GHSA-8r9q-7v3j-jr4g, GHSA-w48q-cv73-mx4w)
+  - **axios** `^1.6.8` -> `^1.20.0` (GHSA-m8m8-qj5v-23w3, GHSA-r4gj-5m52-g5wh, GHSA-c29m-xwm3-cm6r and others)
+- Patched transitive advisories: **proxy-addr** (critical), **sharp**, **source-map-js**, **fast-uri**.
+- Source maps are no longer shipped in the npm package (they referenced unpublished `../../../src` paths).
+
+### Dependencies
+
+- **zod** `3.25.76` -> `4.6.7` (`ZodError.errors` -> `ZodError.issues`)
+- **vitest** / **@vitest/coverage-v8** `4.1.11` -> `5.0.5` (bumped together; peer versions must match)
+
 ## [1.3.13] - 2026-10-05
 
 ### Dependencies
