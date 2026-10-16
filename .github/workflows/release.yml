@@ -7,11 +7,15 @@ on:
 
 permissions:
   contents: write
-  # GitHub OIDC token for MCP Registry authentication (io.github.<owner>/* namespace)
+  # GitHub OIDC token for npm trusted (staged) publishing and
+  # MCP Registry authentication (io.github.<owner>/* namespace)
   id-token: write
 
 env:
   MCP_PUBLISHER_VERSION: v1.8.1
+  NPM_CLI_VERSION: 11.21.1
+  # 60 x 30s = 30 minutes for a maintainer to approve the staged npm package
+  NPM_APPROVAL_WAIT_ATTEMPTS: 60
 
 jobs:
   release:
@@ -49,41 +53,6 @@ jobs:
             if (bad.length) { console.error(`server.json versions ${bad} != package.json ${v}`); process.exit(1); }
           ' "$PKG_VERSION"
 
-      # Skips when the version is already on npm, so a failed run can be re-run
-      # after a manual publish without failing here.
-      - name: Publish to NPM
-        run: |
-          PKG="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
-          if npm view "$PKG" version >/dev/null 2>&1; then
-            echo "$PKG already published — skipping."
-          else
-            npm publish --access public
-          fi
-        env:
-          # Must be a granular token with "Bypass two-factor authentication" enabled,
-          # otherwise npm rejects CI publishes with EOTP.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # The MCP Registry (and marketplaces that import from it) only see new
-      # versions once server.json is published there.
-      # The registry rejects duplicate versions, so skip when this version is
-      # already there (re-runs). Any status other than 200/404 fails the step.
-      - name: Publish to MCP Registry
-        run: |
-          NAME=$(node -p "require('./server.json').name")
-          VERSION=$(node -p "require('./server.json').version")
-          URL="https://registry.modelcontextprotocol.io/v0/servers/$(node -p "encodeURIComponent('$NAME')")/versions/${VERSION}"
-          STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 "$URL")
-          case "$STATUS" in
-            200) echo "$NAME@$VERSION already in MCP Registry — skipping."; exit 0 ;;
-            404) ;;
-            *) echo "::error::Unexpected HTTP $STATUS checking $URL"; exit 1 ;;
-          esac
-          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" \
-            | tar xz mcp-publisher
-          ./mcp-publisher login github-oidc
-          ./mcp-publisher publish
-
       - name: Create release archive
         run: |
           tar -czf wso2-docs-mcp-server-${{ github.ref_name }}.tar.gz \
@@ -102,3 +71,71 @@ jobs:
           name: ${{ github.ref_name }}
           generate_release_notes: true
           files: wso2-docs-mcp-server-${{ github.ref_name }}.tar.gz
+
+      # Staged publishing via trusted publishing (OIDC): CI can only stage; a
+      # maintainer approves on npmjs.com (Staged Packages) with 2FA before the
+      # version goes live. Needs npm >= 11.15.0 and Node >= 22.14.0; Node 22
+      # bundles npm 10. No NPM_TOKEN: the Trusted Publisher on npmjs.com is
+      # bound to this repo + release.yml.
+      - name: Install npm with staged publishing support
+        run: npm install -g npm@${NPM_CLI_VERSION}
+
+      # Last step of the job: a staged version cannot be staged again, so every
+      # step before this must be safe to re-run. Skips when already live.
+      # Only E404 means "not published"; any other lookup error fails the step.
+      - name: Stage npm publish
+        run: |
+          PKG="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
+          if OUT=$(npm view "$PKG" version 2>&1); then
+            echo "$PKG already published — skipping."
+          elif grep -q "E404" <<< "$OUT"; then
+            npm stage publish
+            echo "::notice::$PKG staged. Approve it on npmjs.com → Staged Packages (2FA) to publish; the MCP Registry job waits for it."
+          else
+            echo "::error::Could not check $PKG on npm: $OUT"
+            exit 1
+          fi
+
+  # The MCP Registry (and marketplaces that import from it) only see new
+  # versions once server.json is published there, and the registry requires the
+  # npm version to be live, so this waits for the staged package to be approved.
+  # If approval comes later than the wait window, re-run this job.
+  mcp-registry:
+    name: Publish to MCP Registry
+    runs-on: ubuntu-latest
+    needs: release
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Wait for npm approval
+        run: |
+          PKG="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
+          for _ in $(seq 1 "$NPM_APPROVAL_WAIT_ATTEMPTS"); do
+            if npm view "$PKG" version >/dev/null 2>&1; then
+              echo "$PKG is live on npm."
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::$PKG is not live yet. Approve it on npmjs.com → Staged Packages, then re-run this job."
+          exit 1
+
+      # The registry rejects duplicate versions, so skip when this version is
+      # already there (re-runs). Any status other than 200/404 fails the step.
+      - name: Publish to MCP Registry
+        run: |
+          NAME=$(node -p "require('./server.json').name")
+          VERSION=$(node -p "require('./server.json').version")
+          URL="https://registry.modelcontextprotocol.io/v0/servers/$(node -p "encodeURIComponent('$NAME')")/versions/${VERSION}"
+          STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 "$URL")
+          case "$STATUS" in
+            200) echo "$NAME@$VERSION already in MCP Registry — skipping."; exit 0 ;;
+            404) ;;
+            *) echo "::error::Unexpected HTTP $STATUS checking $URL"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" \
+            | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
