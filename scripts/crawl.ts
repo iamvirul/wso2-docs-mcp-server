@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { createHash } from 'crypto';
-import { PRODUCTS, PRODUCT_IDS } from '../src/config/constants';
-import { GitHubDocFetcher } from '../src/ingestion/githubFetcher';
-import { MarkdownParser } from '../src/ingestion/markdownParser';
-import { DocCrawler } from '../src/ingestion/crawler';
-import { DocParser } from '../src/ingestion/parser';
-import { DocChunker } from '../src/ingestion/chunker';
-import { EmbedderFactory, embedChunks } from '../src/ingestion/embedder';
-import { PgVectorStore } from '../src/vectorstore/pgvector';
+import { PRODUCTS, PRODUCT_IDS } from '../src/config/constants.js';
+import { GitHubDocFetcher } from '../src/ingestion/githubFetcher.js';
+import { MarkdownParser } from '../src/ingestion/markdownParser.js';
+import { DocCrawler } from '../src/ingestion/crawler.js';
+import { DocParser } from '../src/ingestion/parser.js';
+import { DocChunker } from '../src/ingestion/chunker.js';
+import { EmbedderFactory, embedChunks } from '../src/ingestion/embedder.js';
+import { PgVectorStore } from '../src/vectorstore/pgvector.js';
 
 const program = new Command();
 

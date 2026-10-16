@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { createHash } from 'crypto';
 import pLimit from 'p-limit';
-import { GitHubDocSource } from '../config/constants';
+import { GitHubDocSource } from '../config/constants.js';
 
 /** A fetched Markdown file from GitHub, drop-in replacement for CrawledPage */
 export interface FetchedFile {

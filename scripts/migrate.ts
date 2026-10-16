@@ -4,7 +4,7 @@
  * Run: npm run db:migrate
  */
 import { Pool } from 'pg';
-import { env } from '../src/config/env';
+import { env } from '../src/config/env.js';
 
 async function migrate(): Promise<void> {
     const dims = env.EMBEDDING_DIMENSIONS;

@@ -1,5 +1,5 @@
-import { env } from '../config/env';
-import { ParsedPage } from './parser';
+import { env } from '../config/env.js';
+import { ParsedPage } from './parser.js';
 
 export interface DocChunk {
     product: string;

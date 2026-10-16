@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { env } from '../config/env';
+import { env } from '../config/env.js';
 
 export interface UpsertChunkInput {
     product: string;
