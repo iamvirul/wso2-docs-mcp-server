@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `server.json` was stuck at `1.3.0` and the MCP Registry at `1.2.0`, so marketplaces importing from the registry kept scanning an old package. `server.json` now tracks the package version (`1.3.14`).
+
+### Changed
+
+- Release workflow publishes `server.json` to the MCP Registry via GitHub OIDC after the npm publish.
+- Release workflow fails early if `server.json` and `package.json` versions differ, and skips `npm publish` when the version is already on npm so a failed release can be re-run.
+- Prepare Release workflow keeps `server.json` in sync when bumping the version.
+
 ## [1.3.14] - 2026-10-16
 
 ### Added
