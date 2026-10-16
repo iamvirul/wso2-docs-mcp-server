@@ -5,19 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.13] - 2026-10-16
 
-### Fixed
-
-- `server.json` was stuck at `1.3.0` and the MCP Registry at `1.2.0`, so marketplaces importing from the registry kept scanning an old package. `server.json` now tracks the package version (`1.3.14`).
-
-### Changed
-
-- Release workflow publishes `server.json` to the MCP Registry via GitHub OIDC after the npm publish.
-- Release workflow fails early if `server.json` and `package.json` versions differ, and skips `npm publish` when the version is already on npm so a failed release can be re-run.
-- Prepare Release workflow keeps `server.json` in sync when bumping the version.
-
-## [1.3.14] - 2026-10-16
+> 1.3.13 and the briefly tagged 1.3.14 were never published to npm; this is the first release after 1.3.12.
 
 ### Added
 
@@ -27,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Published package crashed on startup with `ERR_MODULE_NOT_FOUND`: compiled ESM output used extensionless relative imports. Switched to `NodeNext` module resolution and added explicit `.js` extensions.
 - Startup failures caused by connection errors (e.g. `ECONNREFUSED`) now print the error code instead of an empty message.
+- `server.json` was stuck at `1.3.0` and the MCP Registry at `1.2.0`, so marketplaces importing from the registry kept scanning an old package. `server.json` now tracks the package version.
 
 ### Security
 
@@ -36,15 +27,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Patched transitive advisories: **proxy-addr** (critical), **sharp**, **source-map-js**, **fast-uri**.
 - Source maps are no longer shipped in the npm package (they referenced unpublished `../../../src` paths).
 
+### Changed
+
+- Release workflow publishes `server.json` to the MCP Registry via GitHub OIDC after the npm publish.
+- Release workflow fails early if `server.json` and `package.json` versions differ, and skips `npm publish` when the version is already on npm so a failed release can be re-run.
+- Prepare Release workflow keeps `server.json` in sync when bumping the version.
+
 ### Dependencies
 
 - **zod** `3.25.76` -> `4.6.7` (`ZodError.errors` -> `ZodError.issues`)
 - **vitest** / **@vitest/coverage-v8** `4.1.11` -> `5.0.5` (bumped together; peer versions must match)
-
-## [1.3.13] - 2026-10-05
-
-### Dependencies
-
 - **dotenv** `17.4.2` -> `18.0.0`
 - **ip-address** `10.4.0` -> `10.7.3`
 - **undici** `7.29.0` -> `7.30.0`
@@ -238,7 +230,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ONNX Runtime native thread conflict with concurrent HTTP+gzip threads (mutex lock failed / SIGABRT at exit code 134) — resolved by deferring provider initialization to after all network I/O completes
 - MCP server entry point path corrected (`dist/src/index.js` not `dist/index.js`) due to `tsconfig.json` `rootDir: "."`
 
-[1.3.14]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.13...v1.3.14
 [1.3.13]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.12...v1.3.13
 [1.3.12]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.11...v1.3.12
 [1.3.11]: https://github.com/iamvirul/wso2-docs-mcp-server/compare/v1.3.10...v1.3.11
