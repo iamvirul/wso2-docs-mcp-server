@@ -2,9 +2,9 @@ import OpenAI from 'openai';
 import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import axios from 'axios';
 import type { Readable } from 'stream';
-import { env } from '../config/env';
-import { DocChunk } from './chunker';
-import { detectAccelerator } from './accelerator';
+import { env } from '../config/env.js';
+import { DocChunk } from './chunker.js';
+import { detectAccelerator } from './accelerator.js';
 
 interface OllamaTagsResponse {
     models: Array<{ name: string }>;

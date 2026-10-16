@@ -1,9 +1,9 @@
-import { DocSearchResult } from '../vectorstore/pgvector';
+import { DocSearchResult } from '../vectorstore/pgvector.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { PgVectorStore } from '../vectorstore/pgvector';
-import { EmbeddingProvider } from '../ingestion/embedder';
+import { PgVectorStore } from '../vectorstore/pgvector.js';
+import { EmbeddingProvider } from '../ingestion/embedder.js';
 import { z } from 'zod';
-import { PRODUCTS } from '../config/constants';
+import { PRODUCTS } from '../config/constants.js';
 
 const productEnum = z.enum(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library', 'is']);
 

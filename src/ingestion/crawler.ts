@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createHash } from 'crypto';
 import pLimit from 'p-limit';
-import { env } from '../config/env';
-import { ProductConfig, CRAWLER_DEFAULTS } from '../config/constants';
+import { env } from '../config/env.js';
+import { ProductConfig, CRAWLER_DEFAULTS } from '../config/constants.js';
 
 export interface CrawledPage {
     url: string;

@@ -38,7 +38,7 @@ const result = schema.safeParse(process.env);
 
 if (!result.success) {
     console.error('❌  Invalid environment configuration:');
-    result.error.errors.forEach((e) =>
+    result.error.issues.forEach((e) =>
         console.error(`   ${e.path.join('.')}: ${e.message}`)
     );
     process.exit(1);

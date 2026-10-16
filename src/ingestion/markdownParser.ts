@@ -1,4 +1,4 @@
-import { ParsedPage, ParsedSection } from './parser';
+import { ParsedPage, ParsedSection } from './parser.js';
 
 /**
  * Parses raw Markdown into ParsedPage — the same format produced by DocParser

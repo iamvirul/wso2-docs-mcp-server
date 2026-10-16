@@ -1,9 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { PgVectorStore } from '../vectorstore/pgvector';
-import { EmbedderFactory } from '../ingestion/embedder';
-import { registerTools } from './toolRegistry';
-import { env } from '../config/env';
+import { PgVectorStore } from '../vectorstore/pgvector.js';
+import { EmbedderFactory } from '../ingestion/embedder.js';
+import { registerTools } from './toolRegistry.js';
+import { env } from '../config/env.js';
 
 export async function startMcpServer(): Promise<void> {
     const vectorStore = new PgVectorStore();

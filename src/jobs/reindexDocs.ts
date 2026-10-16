@@ -1,11 +1,11 @@
 import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
-import { DocCrawler } from '../ingestion/crawler';
-import { DocParser } from '../ingestion/parser';
-import { DocChunker } from '../ingestion/chunker';
-import { EmbedderFactory, embedChunks } from '../ingestion/embedder';
-import { PgVectorStore } from '../vectorstore/pgvector';
-import { PRODUCTS, ProductConfig } from '../config/constants';
+import { DocCrawler } from '../ingestion/crawler.js';
+import { DocParser } from '../ingestion/parser.js';
+import { DocChunker } from '../ingestion/chunker.js';
+import { EmbedderFactory, embedChunks } from '../ingestion/embedder.js';
+import { PgVectorStore } from '../vectorstore/pgvector.js';
+import { PRODUCTS, ProductConfig } from '../config/constants.js';
 import cron from 'node-cron';
 
 export class ReindexJob {
