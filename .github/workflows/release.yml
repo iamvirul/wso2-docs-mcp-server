@@ -7,6 +7,11 @@ on:
 
 permissions:
   contents: write
+  # GitHub OIDC token for MCP Registry authentication (io.github.<owner>/* namespace)
+  id-token: write
+
+env:
+  MCP_PUBLISHER_VERSION: v1.8.1
 
 jobs:
   release:
@@ -34,10 +39,50 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify server.json matches package version
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          node -e '
+            const s = require("./server.json");
+            const v = process.argv[1];
+            const bad = [s.version, ...s.packages.map((p) => p.version)].filter((x) => x !== v);
+            if (bad.length) { console.error(`server.json versions ${bad} != package.json ${v}`); process.exit(1); }
+          ' "$PKG_VERSION"
+
+      # Skips when the version is already on npm, so a failed run can be re-run
+      # after a manual publish without failing here.
       - name: Publish to NPM
-        run: npm publish --access public
+        run: |
+          PKG="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
+          if npm view "$PKG" version >/dev/null 2>&1; then
+            echo "$PKG already published — skipping."
+          else
+            npm publish --access public
+          fi
         env:
+          # Must be a granular token with "Bypass two-factor authentication" enabled,
+          # otherwise npm rejects CI publishes with EOTP.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # The MCP Registry (and marketplaces that import from it) only see new
+      # versions once server.json is published there.
+      # The registry rejects duplicate versions, so skip when this version is
+      # already there (re-runs). Any status other than 200/404 fails the step.
+      - name: Publish to MCP Registry
+        run: |
+          NAME=$(node -p "require('./server.json').name")
+          VERSION=$(node -p "require('./server.json').version")
+          URL="https://registry.modelcontextprotocol.io/v0/servers/$(node -p "encodeURIComponent('$NAME')")/versions/${VERSION}"
+          STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 "$URL")
+          case "$STATUS" in
+            200) echo "$NAME@$VERSION already in MCP Registry — skipping."; exit 0 ;;
+            404) ;;
+            *) echo "::error::Unexpected HTTP $STATUS checking $URL"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" \
+            | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
 
       - name: Create release archive
         run: |

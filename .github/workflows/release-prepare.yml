@@ -57,6 +57,19 @@ jobs:
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "Bumped to $NEW_VERSION"
 
+      - name: Sync server.json version
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          node --input-type=module << 'EOF'
+          import { readFileSync, writeFileSync } from 'fs';
+
+          const server = JSON.parse(readFileSync('server.json', 'utf-8'));
+          server.version = process.env.NEW_VERSION;
+          server.packages = server.packages.map((p) => ({ ...p, version: process.env.NEW_VERSION }));
+          writeFileSync('server.json', JSON.stringify(server, null, 2) + '\n');
+          EOF
+
       - name: Update CHANGELOG.md
         env:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
@@ -117,7 +130,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add package.json package-lock.json CHANGELOG.md
+          git add package.json package-lock.json CHANGELOG.md server.json
           git commit -m "chore(release): v${NEW_VERSION}"
 
           git tag "v${NEW_VERSION}" -m "Release v${NEW_VERSION}"
