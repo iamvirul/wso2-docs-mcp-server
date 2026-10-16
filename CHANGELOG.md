@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Release workflow publishes to npm via **trusted publishing (OIDC)** with provenance instead of a long-lived `NPM_TOKEN`, ahead of npm removing publish rights from 2FA-bypass tokens (Jan 2027).
+- Release workflow uses **staged publishing via trusted publishing (OIDC)** instead of a long-lived `NPM_TOKEN`: CI stages the package and a maintainer approves it on npmjs.com with 2FA before it goes live. The MCP Registry job waits (up to 30 min) for the approved version.
 - Release workflow publishes `server.json` to the MCP Registry via GitHub OIDC after the npm publish.
 - Release workflow fails early if `server.json` and `package.json` versions differ, and skips `npm publish` when the version is already on npm so a failed release can be re-run.
 - Prepare Release workflow keeps `server.json` in sync when bumping the version.
