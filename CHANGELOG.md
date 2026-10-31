@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Dependencies
 
+- **fast-uri** `3.1.8` -> `3.1.9`
 - **follow-redirects** `1.16.0` -> `1.16.2`
 - **hono** `4.13.7` -> `4.13.14`
 
