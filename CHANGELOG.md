@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **hono** `4.13.7` -> `4.13.14`
 - **undici** `7.30.0` -> `7.30.1`
 - **body-parser** `2.3.0` -> `2.4.0`
+- **ip-address** `10.7.3` -> `10.7.5`
 
 ## [1.3.13] - 2026-10-16
 
