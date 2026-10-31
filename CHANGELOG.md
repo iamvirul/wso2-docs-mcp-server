@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - **follow-redirects** `1.16.0` -> `1.16.2`
+- **hono** `4.13.7` -> `4.13.14`
 
 ## [1.3.13] - 2026-10-16
 
