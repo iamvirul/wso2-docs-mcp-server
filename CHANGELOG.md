@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **follow-redirects** `1.16.0` -> `1.16.2`
 - **hono** `4.13.7` -> `4.13.14`
 - **undici** `7.30.0` -> `7.30.1`
+- **body-parser** `2.3.0` -> `2.4.0`
 
 ## [1.3.13] - 2026-10-16
 
