@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - **@hono/node-server** `2.1.0` -> `2.1.5`
+- **@huggingface/transformers** `4.3.1` -> `4.3.2`
+- **@modelcontextprotocol/sdk** `1.32.1` -> `1.32.2`
+- **axios** `1.20.0` -> `1.21.0`
+- **dotenv** `18.0.8` -> `18.0.9`
+- **openai** `7.34.0` -> `7.45.1`
 
 ## [1.3.14] - 2026-10-31
 
