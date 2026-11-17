@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - **@hono/node-server** `2.1.5` -> `2.1.8`
+- **hono** `4.13.14` -> `4.13.19`
 
 ## [1.3.16] - 2026-11-09
 
