@@ -93,19 +93,19 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg17
         env:
-          POSTGRES_USER: wso2mcp
-          POSTGRES_PASSWORD: wso2mcp
-          POSTGRES_DB: wso2docs
+          POSTGRES_USER: choreomcp
+          POSTGRES_PASSWORD: choreomcp
+          POSTGRES_DB: choreodocs
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U wso2mcp -d wso2docs"
+          --health-cmd "pg_isready -U choreomcp -d choreodocs"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
 
     env:
-      DATABASE_URL: postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs
+      DATABASE_URL: postgresql://choreomcp:choreomcp@localhost:5432/choreodocs
       # Nothing listens here, so the default provider takes the zero-config
       # HuggingFace ONNX fallback path that most users hit.
       OLLAMA_BASE_URL: http://127.0.0.1:9

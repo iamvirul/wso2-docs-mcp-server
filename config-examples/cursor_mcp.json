@@ -1,10 +1,10 @@
 {
     "mcpServers": {
-        "wso2-docs": {
+        "choreo-docs": {
             "command": "npx",
-            "args": ["-y", "wso2-docs-mcp-server"],
+            "args": ["-y", "choreo-docs-mcp-server"],
             "env": {
-                "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+                "DATABASE_URL": "postgresql://choreomcp:choreomcp@localhost:5432/choreodocs",
                 "EMBEDDING_PROVIDER": "ollama"
             }
         }
