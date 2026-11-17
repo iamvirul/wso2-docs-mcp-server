@@ -9,17 +9,17 @@ const productEnum = z.enum(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library'
 
 const searchDocsSchema = {
     query: z.string().min(1).describe('Natural language search query'),
-    product: productEnum.optional().describe('Filter to a specific WSO2 product'),
+    product: productEnum.optional().describe('Filter to a specific Choreo Labs (formerly WSO2) product'),
     limit: z.number().int().min(1).max(20).optional().describe('Max results (default 5)'),
 };
 
 const getGuideSchema = {
     topic: z.string().min(1).describe('Topic or concept to look up'),
-    product: productEnum.describe('WSO2 product to search within'),
+    product: productEnum.describe('Choreo Labs (formerly WSO2) product to search within'),
 };
 
 const explainConceptSchema = {
-    concept: z.string().min(1).describe('The WSO2 concept, feature, or term to explain'),
+    concept: z.string().min(1).describe('The Choreo Labs (formerly WSO2) concept, feature, or term to explain'),
 };
 
 export interface ToolDeps {
@@ -46,8 +46,8 @@ export function registerTools(server: McpServer, deps: ToolDeps): void {
 function registerSearchDocs(server: McpServer, deps: ToolDeps): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
     server.tool(
-        'search_wso2_docs',
-        'Semantically search across all indexed WSO2 documentation and return the most relevant sections with metadata and source URLs.',
+        'search_choreo_docs',
+        'Semantically search across all indexed Choreo Labs (formerly WSO2) documentation and return the most relevant sections with metadata and source URLs.',
         searchDocsSchema,
         async ({ query, product, limit }) => {
             const embedding = (await deps.embeddingProvider.embed([query]))[0];
@@ -78,8 +78,8 @@ function registerSearchDocs(server: McpServer, deps: ToolDeps): void {
 function registerGetGuide(server: McpServer, deps: ToolDeps): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
     server.tool(
-        'get_wso2_guide',
-        'Retrieve documentation sections focused on a specific WSO2 product and topic.',
+        'get_choreo_guide',
+        'Retrieve documentation sections focused on a specific Choreo Labs (formerly WSO2) product and topic.',
         getGuideSchema,
         async ({ topic, product }) => {
             const query = `${PRODUCTS[product]?.name ?? product}: ${topic}`;
@@ -111,8 +111,8 @@ function registerGetGuide(server: McpServer, deps: ToolDeps): void {
 function registerExplainConcept(server: McpServer, deps: ToolDeps): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
     server.tool(
-        'explain_wso2_concept',
-        'Retrieve comprehensive documentation context for a WSO2 concept, searched across all products.',
+        'explain_choreo_concept',
+        'Retrieve comprehensive documentation context for a Choreo Labs (formerly WSO2) concept, searched across all products.',
         explainConceptSchema,
         async ({ concept }) => {
             const embedding = (await deps.embeddingProvider.embed([concept]))[0];
@@ -148,8 +148,8 @@ function registerExplainConcept(server: McpServer, deps: ToolDeps): void {
 function registerListProducts(server: McpServer): void {
     // @ts-ignore: TS2589 — MCP SDK deeply nested overload triggers false positive
     server.tool(
-        'list_wso2_products',
-        'List all supported WSO2 documentation sources with their product IDs and base URLs.',
+        'list_choreo_products',
+        'List all supported Choreo Labs (formerly WSO2) documentation sources with their product IDs and base URLs.',
         {},
         async () => {
             const products = Object.values(PRODUCTS).map((p) => ({

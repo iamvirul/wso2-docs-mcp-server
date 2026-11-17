@@ -21,10 +21,10 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 // Model download + load happens before the server accepts the handshake.
 const REQUEST_TIMEOUT_MS = 300_000;
 const EXPECTED_TOOLS = [
-    'explain_wso2_concept',
-    'get_wso2_guide',
-    'list_wso2_products',
-    'search_wso2_docs',
+    'explain_choreo_concept',
+    'get_choreo_guide',
+    'list_choreo_products',
+    'search_choreo_docs',
 ];
 const SEED = {
     product: 'apim',
@@ -97,21 +97,21 @@ async function exerciseServer(binDir: string): Promise<void> {
         console.log('✔ tools/list returned all expected tools');
 
         const products: Array<{ id: string }> = JSON.parse(
-            firstText(await client.callTool({ name: 'list_wso2_products', arguments: {} }, undefined, opts))
+            firstText(await client.callTool({ name: 'list_choreo_products', arguments: {} }, undefined, opts))
         );
-        assert.ok(products.some((p) => p.id === SEED.product), `list_wso2_products missing ${SEED.product}`);
-        console.log('✔ list_wso2_products');
+        assert.ok(products.some((p) => p.id === SEED.product), `list_choreo_products missing ${SEED.product}`);
+        console.log('✔ list_choreo_products');
 
         const search = await client.callTool(
-            { name: 'search_wso2_docs', arguments: { query: 'How do I configure rate limiting?', product: 'apim', limit: 3 } },
+            { name: 'search_choreo_docs', arguments: { query: 'How do I configure rate limiting?', product: 'apim', limit: 3 } },
             undefined,
             opts
         );
-        assert.notEqual(search.isError, true, `search_wso2_docs errored: ${firstText(search)}`);
-        assert.ok(firstText(search).includes(SEED.source_url), 'search_wso2_docs did not return the seeded chunk');
-        console.log('✔ search_wso2_docs returned seeded chunk (embedding + pgvector query)');
+        assert.notEqual(search.isError, true, `search_choreo_docs errored: ${firstText(search)}`);
+        assert.ok(firstText(search).includes(SEED.source_url), 'search_choreo_docs did not return the seeded chunk');
+        console.log('✔ search_choreo_docs returned seeded chunk (embedding + pgvector query)');
 
-        const invalid = await client.callTool({ name: 'search_wso2_docs', arguments: { query: '' } }, undefined, opts);
+        const invalid = await client.callTool({ name: 'search_choreo_docs', arguments: { query: '' } }, undefined, opts);
         assert.equal(invalid.isError, true, 'empty query should be rejected by input validation');
         console.log('✔ input validation rejects empty query');
     } finally {
