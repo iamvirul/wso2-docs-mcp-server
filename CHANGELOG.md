@@ -19,7 +19,7 @@ WSO2 is now [Choreo Labs](https://choreolabs.com/). The package has been rebrand
 - Crawler User-Agent is now `Choreo-Labs-Docs-MCP-*`
 - Product and tool descriptions now read "Choreo Labs (formerly WSO2)"; the `library` source is named "Choreo Labs Library"
 
-Unchanged: upstream docs URLs (`*.docs.wso2.com`, `wso2.com/...`), GitHub source repos (`wso2/docs-*`), product IDs, product names, and the database schema.
+Unchanged: upstream docs URLs (`*.docs.wso2.com`, `wso2.com/...`), GitHub source repos (`wso2/docs-*`), product IDs, product names (except the `library` display name above), and the database schema. When keeping an existing docker-compose database, keep the original Compose project name so the old `pgvector_data` volume is reused (see migration guide).
 
 ### Dependencies
 

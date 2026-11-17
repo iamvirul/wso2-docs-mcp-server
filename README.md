@@ -319,7 +319,7 @@ See `config-examples/claude_code.sh` for a convenience script.
 
 ## Migrating from wso2-docs-mcp-server
 
-WSO2 is now [Choreo Labs](https://choreolabs.com/). Version 2.0.0 renames this package to match. Upstream docs URLs, product names and product IDs (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`) are **unchanged**.
+WSO2 is now [Choreo Labs](https://choreolabs.com/). Version 2.0.0 renames this package to match. Upstream docs URLs, product IDs (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`) and product names are **unchanged**. The one exception is the `library` source, which is now named "Choreo Labs Library" (formerly "WSO2 Library").
 
 | What | Before (≤ 1.x) | After (≥ 2.0) |
 |------|----------------|---------------|
@@ -336,7 +336,7 @@ WSO2 is now [Choreo Labs](https://choreolabs.com/). Version 2.0.0 renames this p
 2. In your MCP client config, update `command`/`args` to the new binary names. You can also rename the server key (e.g. `"wso2-docs"` → `"choreo-labs-docs"`).
 3. Update any prompts, agent instructions or tool allowlists that reference the old tool names.
 4. **Database** — pick one:
-   - **Keep your existing index (no re-crawl):** leave your current `DATABASE_URL` (`postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs`) as is. Postgres ignores the new `POSTGRES_*` values in `docker-compose.yml` because the existing volume is already initialised, so the old credentials keep working.
+   - **Keep your existing index (no re-crawl):** Compose names the data volume `<project>_pgvector_data`, and the project name defaults to the directory you run `docker compose` from. Renaming or re-cloning the repo (the new default clone directory is `choreo-labs-docs-mcp-server`) therefore points Compose at a new, empty volume. Find your existing volume with `docker volume ls | grep pgvector_data`, then either keep running Compose from the original directory or pin the old project name, e.g. `COMPOSE_PROJECT_NAME=wso2-docs-mcp-server docker compose up -d` (use the prefix shown before `_pgvector_data`). Leave your current `DATABASE_URL` (`postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs`) as is: Postgres ignores the new `POSTGRES_*` values in `docker-compose.yml` because that volume is already initialised, so the old credentials keep working.
    - **Start fresh with the new defaults:** `docker compose down -v`, download the new `docker-compose.yml`, `docker compose up -d`, then run `choreo-labs-docs-migrate` and `choreo-labs-docs-crawl` with `postgresql://choreomcp:choreomcp@localhost:5432/choreodocs`.
 
 The schema is unchanged, so you don't need a data migration.
