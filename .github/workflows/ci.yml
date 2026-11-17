@@ -93,19 +93,19 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg17
         env:
-          POSTGRES_USER: wso2mcp
-          POSTGRES_PASSWORD: wso2mcp
-          POSTGRES_DB: wso2docs
+          POSTGRES_USER: choreomcp
+          POSTGRES_PASSWORD: choreomcp
+          POSTGRES_DB: choreodocs
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U wso2mcp -d wso2docs"
+          --health-cmd "pg_isready -U choreomcp -d choreodocs"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
 
     env:
-      DATABASE_URL: postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs
+      DATABASE_URL: postgresql://choreomcp:choreomcp@localhost:5432/choreodocs
       # Nothing listens here, so the default provider takes the zero-config
       # HuggingFace ONNX fallback path that most users hit.
       OLLAMA_BASE_URL: http://127.0.0.1:9
@@ -135,7 +135,7 @@ jobs:
           mkdir -p "$CONSUMER_DIR"
           cd "$CONSUMER_DIR"
           npm init -y >/dev/null
-          npm install --no-audit --no-fund "$RUNNER_TEMP"/wso2-docs-mcp-server-*.tgz
+          npm install --no-audit --no-fund "$RUNNER_TEMP"/choreo-labs-docs-mcp-server-*.tgz
 
       - name: Cache embedding model
         uses: actions/cache@v6
@@ -145,14 +145,14 @@ jobs:
 
       - name: Run migrations (twice, to verify idempotency)
         run: |
-          "$CONSUMER_DIR/node_modules/.bin/wso2-docs-migrate"
-          "$CONSUMER_DIR/node_modules/.bin/wso2-docs-migrate"
+          "$CONSUMER_DIR/node_modules/.bin/choreo-labs-docs-migrate"
+          "$CONSUMER_DIR/node_modules/.bin/choreo-labs-docs-migrate"
 
       - name: Crawl CLI loads
-        run: '"$CONSUMER_DIR/node_modules/.bin/wso2-docs-crawl" --help'
+        run: '"$CONSUMER_DIR/node_modules/.bin/choreo-labs-docs-crawl" --help'
 
       - name: MCP end-to-end smoke test
         run: npm run test:smoke
         env:
-          SMOKE_PACKAGE_DIR: ${{ env.CONSUMER_DIR }}/node_modules/wso2-docs-mcp-server
+          SMOKE_PACKAGE_DIR: ${{ env.CONSUMER_DIR }}/node_modules/choreo-labs-docs-mcp-server
           SMOKE_BIN_DIR: ${{ env.CONSUMER_DIR }}/node_modules/.bin

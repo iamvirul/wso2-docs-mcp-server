@@ -75,24 +75,24 @@ describe('toolRegistry — registerTools()', () => {
         expect(server.tool).toHaveBeenCalledTimes(4);
     });
 
-    it('registers search_wso2_docs', () => {
-        expect(server.registeredTools.has('search_wso2_docs')).toBe(true);
+    it('registers search_choreo_docs', () => {
+        expect(server.registeredTools.has('search_choreo_docs')).toBe(true);
     });
 
-    it('registers get_wso2_guide', () => {
-        expect(server.registeredTools.has('get_wso2_guide')).toBe(true);
+    it('registers get_choreo_guide', () => {
+        expect(server.registeredTools.has('get_choreo_guide')).toBe(true);
     });
 
-    it('registers explain_wso2_concept', () => {
-        expect(server.registeredTools.has('explain_wso2_concept')).toBe(true);
+    it('registers explain_choreo_concept', () => {
+        expect(server.registeredTools.has('explain_choreo_concept')).toBe(true);
     });
 
-    it('registers list_wso2_products', () => {
-        expect(server.registeredTools.has('list_wso2_products')).toBe(true);
+    it('registers list_choreo_products', () => {
+        expect(server.registeredTools.has('list_choreo_products')).toBe(true);
     });
 });
 
-describe('search_wso2_docs handler', () => {
+describe('search_choreo_docs handler', () => {
     let server: ReturnType<typeof createMockServer>;
 
     beforeEach(() => {
@@ -104,7 +104,7 @@ describe('search_wso2_docs handler', () => {
     });
 
     it('embeds the query and calls similaritySearch', async () => {
-        const handler = server.registeredTools.get('search_wso2_docs')!.handler;
+        const handler = server.registeredTools.get('search_choreo_docs')!.handler;
         await handler({ query: 'how to deploy API Manager', limit: 3 });
 
         expect(mockEmbed).toHaveBeenCalledWith(['how to deploy API Manager']);
@@ -112,7 +112,7 @@ describe('search_wso2_docs handler', () => {
     });
 
     it('returns formatted RAG results with score', async () => {
-        const handler = server.registeredTools.get('search_wso2_docs')!.handler;
+        const handler = server.registeredTools.get('search_choreo_docs')!.handler;
         const response = await handler({ query: 'gateway', limit: 5 }) as any;
         const parsed = JSON.parse(response.content[0].text);
 
@@ -124,21 +124,21 @@ describe('search_wso2_docs handler', () => {
 
     it('returns helpful message when no results found', async () => {
         mockSimilaritySearch.mockResolvedValueOnce([]);
-        const handler = server.registeredTools.get('search_wso2_docs')!.handler;
+        const handler = server.registeredTools.get('search_choreo_docs')!.handler;
         const response = await handler({ query: 'nothing', limit: 5 }) as any;
 
         expect(response.content[0].text).toContain('npm run crawl');
     });
 
     it('passes product filter to similaritySearch', async () => {
-        const handler = server.registeredTools.get('search_wso2_docs')!.handler;
+        const handler = server.registeredTools.get('search_choreo_docs')!.handler;
         await handler({ query: 'publishing APIs', product: 'apim', limit: 5 });
 
         expect(mockSimilaritySearch).toHaveBeenCalledWith(fakeEmbedding, { product: 'apim', limit: 5 });
     });
 });
 
-describe('get_wso2_guide handler', () => {
+describe('get_choreo_guide handler', () => {
     let server: ReturnType<typeof createMockServer>;
 
     beforeEach(() => {
@@ -150,14 +150,14 @@ describe('get_wso2_guide handler', () => {
     });
 
     it('forces product filter and limit=5', async () => {
-        const handler = server.registeredTools.get('get_wso2_guide')!.handler;
+        const handler = server.registeredTools.get('get_choreo_guide')!.handler;
         await handler({ topic: 'OAuth setup', product: 'apim' });
 
         expect(mockSimilaritySearch).toHaveBeenCalledWith(fakeEmbedding, { product: 'apim', limit: 5 });
     });
 
     it('prefixes query with product name', async () => {
-        const handler = server.registeredTools.get('get_wso2_guide')!.handler;
+        const handler = server.registeredTools.get('get_choreo_guide')!.handler;
         await handler({ topic: 'publish API', product: 'apim' });
 
         const queryText = mockEmbed.mock.calls[0][0][0];
@@ -166,7 +166,7 @@ describe('get_wso2_guide handler', () => {
     });
 });
 
-describe('explain_wso2_concept handler', () => {
+describe('explain_choreo_concept handler', () => {
     let server: ReturnType<typeof createMockServer>;
 
     beforeEach(() => {
@@ -178,14 +178,14 @@ describe('explain_wso2_concept handler', () => {
     });
 
     it('searches limit=8 across all products', async () => {
-        const handler = server.registeredTools.get('explain_wso2_concept')!.handler;
+        const handler = server.registeredTools.get('explain_choreo_concept')!.handler;
         await handler({ concept: 'mediation' });
 
         expect(mockSimilaritySearch).toHaveBeenCalledWith(fakeEmbedding, { limit: 8 });
     });
 
     it('returns context with concept field', async () => {
-        const handler = server.registeredTools.get('explain_wso2_concept')!.handler;
+        const handler = server.registeredTools.get('explain_choreo_concept')!.handler;
         const response = await handler({ concept: 'rate limiting' }) as any;
         const parsed = JSON.parse(response.content[0].text);
 
@@ -194,7 +194,7 @@ describe('explain_wso2_concept handler', () => {
     });
 });
 
-describe('list_wso2_products handler', () => {
+describe('list_choreo_products handler', () => {
     let server: ReturnType<typeof createMockServer>;
 
     beforeEach(() => {
@@ -204,7 +204,7 @@ describe('list_wso2_products handler', () => {
     });
 
     it('returns all 7 products', async () => {
-        const handler = server.registeredTools.get('list_wso2_products')!.handler;
+        const handler = server.registeredTools.get('list_choreo_products')!.handler;
         const response = await handler({}) as any;
         const products = JSON.parse(response.content[0].text);
 
@@ -212,7 +212,7 @@ describe('list_wso2_products handler', () => {
     });
 
     it('each product has id, name, description, base_url', async () => {
-        const handler = server.registeredTools.get('list_wso2_products')!.handler;
+        const handler = server.registeredTools.get('list_choreo_products')!.handler;
         const response = await handler({}) as any;
         const products = JSON.parse(response.content[0].text);
 
@@ -225,7 +225,7 @@ describe('list_wso2_products handler', () => {
     });
 
     it('does not call embeddingProvider or vectorStore', async () => {
-        const handler = server.registeredTools.get('list_wso2_products')!.handler;
+        const handler = server.registeredTools.get('list_choreo_products')!.handler;
         await handler({});
         expect(mockEmbed).not.toHaveBeenCalled();
         expect(mockSimilaritySearch).not.toHaveBeenCalled();

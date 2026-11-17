@@ -14,7 +14,7 @@ const program = new Command();
 
 program
     .name('crawl')
-    .description('Index WSO2 documentation into pgvector (GitHub-native Markdown + web-crawl fallback)')
+    .description('Index Choreo Labs (formerly WSO2) documentation into pgvector (GitHub-native Markdown + web-crawl fallback)')
     .option(
         '-p, --product <id>',
         `Product to index. One of: ${PRODUCT_IDS.join(', ')}. Omit to index all.`

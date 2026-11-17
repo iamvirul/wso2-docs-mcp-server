@@ -1,16 +1,16 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.iamvirul/wso2-docs-mcp-server",
-  "description": "Semantic search over WSO2 docs (APIM, IS, MI, Choreo, Ballerina) via RAG and pgvector.",
+  "name": "io.github.iamvirul/choreo-labs-docs-mcp-server",
+  "description": "Semantic search over Choreo Labs (formerly WSO2) docs: APIM, IS, MI, Choreo, Ballerina, via RAG + pgvector.",
   "repository": {
-    "url": "https://github.com/iamvirul/wso2-docs-mcp-server",
+    "url": "https://github.com/iamvirul/choreo-labs-docs-mcp-server",
     "source": "github"
   },
   "version": "1.3.16",
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "wso2-docs-mcp-server",
+      "identifier": "choreo-labs-docs-mcp-server",
       "version": "1.3.16",
       "transport": {
         "type": "stdio"
@@ -18,7 +18,7 @@
       "environmentVariables": [
         {
           "name": "DATABASE_URL",
-          "description": "PostgreSQL connection string for pgvector (e.g. postgresql://user:pass@localhost:5432/wso2docs)",
+          "description": "PostgreSQL connection string for pgvector (e.g. postgresql://user:pass@localhost:5432/choreodocs)",
           "isRequired": true,
           "isSecret": false,
           "format": "string"

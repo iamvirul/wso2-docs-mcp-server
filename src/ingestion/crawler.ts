@@ -18,7 +18,7 @@ export class DocCrawler {
     private client = axios.create({
         timeout: CRAWLER_DEFAULTS.timeout,
         headers: {
-            'User-Agent': 'WSO2-Docs-MCP-Crawler/1.0 (+https://github.com/iamvirul/wso2-docs-mcp-server)',
+            'User-Agent': 'Choreo-Labs-Docs-MCP-Crawler/1.0 (+https://github.com/iamvirul/choreo-labs-docs-mcp-server)',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
             'Accept-Encoding': 'gzip, deflate, br',

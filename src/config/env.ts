@@ -24,7 +24,7 @@ const schema = z.object({
 
     EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(768),
 
-    MCP_SERVER_NAME: z.string().default('wso2-docs-mcp'),
+    MCP_SERVER_NAME: z.string().default('choreo-labs-docs-mcp'),
     MCP_SERVER_VERSION: z.string().default('1.0.0'),
 
     CRAWL_CONCURRENCY: z.coerce.number().int().positive().default(10),
