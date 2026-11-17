@@ -1,8 +1,8 @@
 {
     "mcpServers": {
-        "choreo-docs": {
+        "choreo-labs-docs": {
             "command": "npx",
-            "args": ["-y", "choreo-docs-mcp-server"],
+            "args": ["-y", "choreo-labs-docs-mcp-server"],
             "env": {
                 "DATABASE_URL": "postgresql://choreomcp:choreomcp@localhost:5432/choreodocs",
                 "EMBEDDING_PROVIDER": "ollama"

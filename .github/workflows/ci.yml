@@ -135,7 +135,7 @@ jobs:
           mkdir -p "$CONSUMER_DIR"
           cd "$CONSUMER_DIR"
           npm init -y >/dev/null
-          npm install --no-audit --no-fund "$RUNNER_TEMP"/choreo-docs-mcp-server-*.tgz
+          npm install --no-audit --no-fund "$RUNNER_TEMP"/choreo-labs-docs-mcp-server-*.tgz
 
       - name: Cache embedding model
         uses: actions/cache@v6
@@ -145,14 +145,14 @@ jobs:
 
       - name: Run migrations (twice, to verify idempotency)
         run: |
-          "$CONSUMER_DIR/node_modules/.bin/choreo-docs-migrate"
-          "$CONSUMER_DIR/node_modules/.bin/choreo-docs-migrate"
+          "$CONSUMER_DIR/node_modules/.bin/choreo-labs-docs-migrate"
+          "$CONSUMER_DIR/node_modules/.bin/choreo-labs-docs-migrate"
 
       - name: Crawl CLI loads
-        run: '"$CONSUMER_DIR/node_modules/.bin/choreo-docs-crawl" --help'
+        run: '"$CONSUMER_DIR/node_modules/.bin/choreo-labs-docs-crawl" --help'
 
       - name: MCP end-to-end smoke test
         run: npm run test:smoke
         env:
-          SMOKE_PACKAGE_DIR: ${{ env.CONSUMER_DIR }}/node_modules/choreo-docs-mcp-server
+          SMOKE_PACKAGE_DIR: ${{ env.CONSUMER_DIR }}/node_modules/choreo-labs-docs-mcp-server
           SMOKE_BIN_DIR: ${{ env.CONSUMER_DIR }}/node_modules/.bin

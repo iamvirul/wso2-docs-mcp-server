@@ -256,10 +256,10 @@ This is *italic text* in a sentence with enough content to pass the filter.
         it('strips inline code backticks but keeps content', () => {
             const input = md(`
 ## Section
-Use the \`choreo-docs-crawl\` command to index documentation content here.
+Use the \`choreo-labs-docs-crawl\` command to index documentation content here.
 `);
             const { sections } = parser.parse(input, 'https://example.com');
-            expect(sections[0].text).toContain('choreo-docs-crawl');
+            expect(sections[0].text).toContain('choreo-labs-docs-crawl');
             expect(sections[0].text).not.toContain('`');
         });
 

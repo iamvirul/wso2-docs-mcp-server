@@ -34,7 +34,7 @@ export class GitHubDocFetcher {
         timeout: 30_000,
         headers: {
             'Accept': 'application/vnd.github+json',
-            'User-Agent': 'Choreo-Docs-MCP-Server/1.1 (+https://github.com/iamvirul/choreo-docs-mcp-server)',
+            'User-Agent': 'Choreo-Labs-Docs-MCP-Server/1.1 (+https://github.com/iamvirul/choreo-labs-docs-mcp-server)',
         },
     });
 

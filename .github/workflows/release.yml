@@ -55,7 +55,7 @@ jobs:
 
       - name: Create release archive
         run: |
-          tar -czf choreo-docs-mcp-server-${{ github.ref_name }}.tar.gz \
+          tar -czf choreo-labs-docs-mcp-server-${{ github.ref_name }}.tar.gz \
             dist/ \
             package.json \
             package-lock.json \
@@ -70,7 +70,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           generate_release_notes: true
-          files: choreo-docs-mcp-server-${{ github.ref_name }}.tar.gz
+          files: choreo-labs-docs-mcp-server-${{ github.ref_name }}.tar.gz
 
       # Staged publishing via trusted publishing (OIDC): CI can only stage; a
       # maintainer approves on npmjs.com (Staged Packages) with 2FA before the
