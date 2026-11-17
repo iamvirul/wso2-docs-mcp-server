@@ -83,6 +83,9 @@ jobs:
       - name: Verify dist entry exists
         run: test -f dist/src/index.js
 
+      - name: Validate server.json (versions, names, MCP Registry limits)
+        run: node .github/scripts/validate-server-json.mjs
+
   smoke:
     name: Package Smoke Test
     runs-on: ubuntu-latest
