@@ -43,15 +43,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Verify server.json matches package version
-        run: |
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          node -e '
-            const s = require("./server.json");
-            const v = process.argv[1];
-            const bad = [s.version, ...s.packages.map((p) => p.version)].filter((x) => x !== v);
-            if (bad.length) { console.error(`server.json versions ${bad} != package.json ${v}`); process.exit(1); }
-          ' "$PKG_VERSION"
+      # Runs before anything is published: once npm has a version live, a bad
+      # server.json on the tag can only be fixed with a new release.
+      - name: Validate server.json (versions, names, MCP Registry limits)
+        run: node .github/scripts/validate-server-json.mjs
 
       - name: Create release archive
         run: |
