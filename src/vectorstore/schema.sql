@@ -1,4 +1,4 @@
--- WSO2 Docs MCP Server — pgvector schema
+-- Choreo Docs MCP Server — pgvector schema
 -- NOTE: The default vector(1536) suits OpenAI text-embedding-3-small.
 -- For Gemini (768 dims) or Voyage-3 (1024 dims) run:  npm run db:migrate
 -- which regenerates the schema using your EMBEDDING_DIMENSIONS env var.

@@ -3,7 +3,7 @@ import { PRODUCTS, PRODUCT_IDS } from '../../../src/config/constants';
 
 describe('constants', () => {
     describe('PRODUCTS', () => {
-        it('contains all required WSO2 products', () => {
+        it('contains all required Choreo Labs products', () => {
             expect(Object.keys(PRODUCTS)).toEqual(
                 expect.arrayContaining(['apim', 'choreo', 'ballerina', 'mi', 'bi', 'library'])
             );

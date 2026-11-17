@@ -1,6 +1,6 @@
 
 export interface GitHubDocSource {
-    /** GitHub org or user, e.g. 'wso2' */
+    /** GitHub org or user, e.g. 'wso2' (Choreo Labs still publishes docs under this org) */
     owner: string;
     /** Repository name, e.g. 'docs-apim' */
     repo: string;
@@ -35,7 +35,7 @@ export const PRODUCTS: Record<string, ProductConfig> = {
         name: 'API Manager',
         baseUrl: 'https://apim.docs.wso2.com/en/latest',
         sitemapUrl: 'https://apim.docs.wso2.com/sitemap.xml',
-        description: 'WSO2 API Manager — full lifecycle API management platform',
+        description: 'Choreo Labs (formerly WSO2) API Manager — full lifecycle API management platform',
         githubSource: {
             owner: 'wso2',
             repo: 'docs-apim',
@@ -48,7 +48,7 @@ export const PRODUCTS: Record<string, ProductConfig> = {
         name: 'Micro Integrator',
         baseUrl: 'https://mi.docs.wso2.com/en/4.4.0',
         sitemapUrl: 'https://mi.docs.wso2.com/en/4.4.0/sitemap.xml',
-        description: 'WSO2 Micro Integrator 4.4.0 — lightweight integration engine',
+        description: 'Choreo Labs (formerly WSO2) Micro Integrator 4.4.0 — lightweight integration engine',
         version: '4.4.0',
         githubSource: {
             owner: 'wso2',
@@ -62,7 +62,7 @@ export const PRODUCTS: Record<string, ProductConfig> = {
         name: 'Ballerina Integrator',
         baseUrl: 'https://bi.docs.wso2.com/en/latest',
         sitemapUrl: 'https://bi.docs.wso2.com/sitemap.xml',
-        description: 'WSO2 Ballerina Integrator — integration via the Ballerina language',
+        description: 'Choreo Labs (formerly WSO2) Ballerina Integrator — integration via the Ballerina language',
         githubSource: {
             owner: 'wso2',
             repo: 'docs-bi',
@@ -75,7 +75,7 @@ export const PRODUCTS: Record<string, ProductConfig> = {
         name: 'Choreo',
         baseUrl: 'https://wso2.com/choreo/docs',
         sitemapUrl: 'https://wso2.com/choreo/docs/sitemap.xml',
-        description: 'WSO2 Choreo — cloud-native integration platform',
+        description: 'Choreo by Choreo Labs (formerly WSO2) — cloud-native integration platform',
         githubSource: {
             owner: 'wso2',
             repo: 'docs-choreo-dev',
@@ -93,10 +93,10 @@ export const PRODUCTS: Record<string, ProductConfig> = {
     },
     library: {
         id: 'library',
-        name: 'WSO2 Library',
+        name: 'Choreo Labs Library',
         baseUrl: 'https://wso2.com/library',
         sitemapUrl: 'https://wso2.com/sitemap.xml',
-        description: 'WSO2 whitepapers, articles, case studies, and resources',
+        description: 'Choreo Labs (formerly WSO2) whitepapers, articles, case studies, and resources',
         // No githubSource — no dedicated docs repo; keeps its web-crawl path
     },
     is: {
@@ -104,7 +104,7 @@ export const PRODUCTS: Record<string, ProductConfig> = {
         name: 'Identity Server',
         baseUrl: 'https://is.docs.wso2.com/en/latest',
         sitemapUrl: 'https://is.docs.wso2.com/sitemap.xml',
-        description: 'WSO2 Identity Server — enterprise identity and access management (IAM)',
+        description: 'Choreo Labs (formerly WSO2) Identity Server — enterprise identity and access management (IAM)',
         githubSource: {
             owner: 'wso2',
             repo: 'docs-is',
