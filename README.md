@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/choreo-labs-docs-mcp-server.svg)](https://www.npmjs.com/package/choreo-labs-docs-mcp-server)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Wso2 Docs MCP on mcprush](https://mcprush.com/badge/wso2-docs-mcp/score.svg)](https://mcprush.com/to/wso2-docs-mcp?ref=badge)
-[![io.github.iamvirul/choreo-labs-docs-mcp-server on MCP Marketplace](https://mcp-marketplace.io/api/badge?slug=io-github-iamvirul-choreo-labs-docs-mcp-server)](https://mcp-marketplace.io/server/io-github-iamvirul-choreo-labs-docs-mcp-server)
+
 
 >"This is an unofficial community project. Not affiliated with or endorsed by Choreo Labs (formerly WSO2)."
 
