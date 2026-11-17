@@ -1,14 +1,14 @@
 {
-    "name": "wso2-docs-mcp-server",
+    "name": "choreo-docs-mcp-server",
     "version": "1.3.16",
-    "mcpName": "io.github.iamvirul/wso2-docs-mcp-server",
-    "description": "Production-ready MCP server providing RAG-based access to WSO2 documentation",
+    "mcpName": "io.github.iamvirul/choreo-docs-mcp-server",
+    "description": "Production-ready MCP server providing RAG-based access to Choreo Labs (formerly WSO2) documentation",
     "type": "module",
     "main": "dist/src/index.js",
     "bin": {
-        "wso2-docs-mcp-server": "dist/src/index.js",
-        "wso2-docs-crawl": "dist/scripts/crawl.js",
-        "wso2-docs-migrate": "dist/scripts/migrate.js"
+        "choreo-docs-mcp-server": "dist/src/index.js",
+        "choreo-docs-crawl": "dist/scripts/crawl.js",
+        "choreo-docs-migrate": "dist/scripts/migrate.js"
     },
     "files": [
         "dist",
@@ -23,11 +23,13 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/iamvirul/wso2-docs-mcp-server.git"
+        "url": "git+https://github.com/iamvirul/choreo-docs-mcp-server.git"
     },
     "keywords": [
         "mcp",
         "modelcontextprotocol",
+        "choreo",
+        "choreo-labs",
         "wso2",
         "rag",
         "vector",

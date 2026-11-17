@@ -82,7 +82,7 @@ jobs:
 
           const UNRELEASED = '## [Unreleased]';
           const NEW_HEADER = `## [${newVersion}] - ${today}`;
-          const REPO = 'https://github.com/iamvirul/wso2-docs-mcp-server';
+          const REPO = 'https://github.com/iamvirul/choreo-docs-mcp-server';
 
           let changelog = readFileSync('CHANGELOG.md', 'utf-8');
 

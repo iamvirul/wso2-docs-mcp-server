@@ -20,7 +20,7 @@ interface GitTreeItem {
 }
 
 /**
- * Fetches Markdown documentation from a public WSO2 GitHub repository.
+ * Fetches Markdown documentation from a public Choreo Labs (formerly WSO2) GitHub repository under the `wso2` org.
  *
  * Strategy:
  *   1. One GitHub API call: GET /repos/{owner}/{repo}/git/trees/{branch}?recursive=1
@@ -34,7 +34,7 @@ export class GitHubDocFetcher {
         timeout: 30_000,
         headers: {
             'Accept': 'application/vnd.github+json',
-            'User-Agent': 'WSO2-Docs-MCP-Server/1.1 (+https://github.com/iamvirul/wso2-docs-mcp-server)',
+            'User-Agent': 'Choreo-Docs-MCP-Server/1.1 (+https://github.com/iamvirul/choreo-docs-mcp-server)',
         },
     });
 

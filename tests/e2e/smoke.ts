@@ -6,7 +6,7 @@
  * against a real pgvector database.
  *
  * Required env:
- *   SMOKE_PACKAGE_DIR  absolute path to the installed package (…/node_modules/wso2-docs-mcp-server)
+ *   SMOKE_PACKAGE_DIR  absolute path to the installed package (…/node_modules/choreo-docs-mcp-server)
  *   SMOKE_BIN_DIR      absolute path to the consumer's node_modules/.bin
  *   DATABASE_URL       migrated pgvector database
  *
@@ -83,7 +83,7 @@ async function seedOneChunk(packageDir: string): Promise<void> {
 
 async function exerciseServer(binDir: string): Promise<void> {
     const transport = new StdioClientTransport({
-        command: path.join(binDir, 'wso2-docs-mcp-server'),
+        command: path.join(binDir, 'choreo-docs-mcp-server'),
         env: stringEnv(),
         stderr: 'inherit',
     });
