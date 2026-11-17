@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed — BREAKING
+
+WSO2 is now [Choreo Labs](https://choreolabs.com/). The package has been rebranded to match. Release this as a **major** version. See [Migrating from wso2-docs-mcp-server](README.md#migrating-from-wso2-docs-mcp-server).
+
+- npm package renamed `wso2-docs-mcp-server` → `choreo-docs-mcp-server`; CLI bins renamed to `choreo-docs-mcp-server`, `choreo-docs-crawl`, `choreo-docs-migrate`
+- MCP tools renamed: `search_wso2_docs` → `search_choreo_docs`, `get_wso2_guide` → `get_choreo_guide`, `explain_wso2_concept` → `explain_choreo_concept`, `list_wso2_products` → `list_choreo_products`
+- MCP Registry name `io.github.iamvirul/wso2-docs-mcp-server` → `io.github.iamvirul/choreo-docs-mcp-server`; GitHub repository renamed to `iamvirul/choreo-docs-mcp-server`
+- Default `MCP_SERVER_NAME` `wso2-docs-mcp` → `choreo-docs-mcp`
+- docker-compose and example defaults: DB user/password `wso2mcp` → `choreomcp`, database `wso2docs` → `choreodocs`, containers `wso2docs-*` → `choreodocs-*`
+- Crawler User-Agent is now `Choreo-Docs-MCP-*`
+- Product and tool descriptions now read "Choreo Labs (formerly WSO2)"; the `library` source is named "Choreo Labs Library"
+
+Unchanged: upstream docs URLs (`*.docs.wso2.com`, `wso2.com/...`), GitHub source repos (`wso2/docs-*`), product IDs, product names, and the database schema.
+
 ### Dependencies
 
 - **@hono/node-server** `2.1.5` -> `2.1.8`

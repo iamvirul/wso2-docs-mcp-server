@@ -1,21 +1,23 @@
-# WSO2 Docs MCP Server
+# Choreo Docs MCP Server
 
-[![npm version](https://img.shields.io/npm/v/wso2-docs-mcp-server.svg)](https://www.npmjs.com/package/wso2-docs-mcp-server)
+[![npm version](https://img.shields.io/npm/v/choreo-docs-mcp-server.svg)](https://www.npmjs.com/package/choreo-docs-mcp-server)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Wso2 Docs MCP on mcprush](https://mcprush.com/badge/wso2-docs-mcp/score.svg)](https://mcprush.com/to/wso2-docs-mcp?ref=badge)
-[![io.github.iamvirul/wso2-docs-mcp-server on MCP Marketplace](https://mcp-marketplace.io/api/badge?slug=io-github-iamvirul-wso2-docs-mcp-server)](https://mcp-marketplace.io/server/io-github-iamvirul-wso2-docs-mcp-server)
+[![io.github.iamvirul/choreo-docs-mcp-server on MCP Marketplace](https://mcp-marketplace.io/api/badge?slug=io-github-iamvirul-choreo-docs-mcp-server)](https://mcp-marketplace.io/server/io-github-iamvirul-choreo-docs-mcp-server)
 
->"This is an unofficial community project. Not affiliated with or endorsed by WSO2."
+>"This is an unofficial community project. Not affiliated with or endorsed by Choreo Labs (formerly WSO2)."
 
-A production-ready **Model Context Protocol (MCP)** server that provides AI assistants (Claude Desktop, Claude Code, Cursor, VS Code) with semantic search over WSO2 documentation via Retrieval-Augmented Generation (RAG).
+> **Renamed from `wso2-docs-mcp-server`.** WSO2 is now [Choreo Labs](https://choreolabs.com/), so this package is now `choreo-docs-mcp-server` and its tools are `*_choreo_*`. Upgrading from `wso2-docs-mcp-server`? See [Migrating from wso2-docs-mcp-server](#migrating-from-wso2-docs-mcp-server).
+
+A production-ready **Model Context Protocol (MCP)** server that provides AI assistants (Claude Desktop, Claude Code, Cursor, VS Code) with semantic search over Choreo Labs (formerly WSO2) documentation via Retrieval-Augmented Generation (RAG).
 
 Under the hood, it uses a blazing-fast dual-ingestion engine:
-- **GitHub Native:** Fetches raw Markdown directly from WSO2's public GitHub repositories via the Git Trees API (avoids web-scraping noise and rate limits)
-- **Web Crawl Fallback:** For products without dedicated GitHub docs repos (like the WSO2 Library)
+- **GitHub Native:** Fetches raw Markdown directly from Choreo Labs' public GitHub repositories (the `wso2` org) via the Git Trees API (avoids web-scraping noise and rate limits)
+- **Web Crawl Fallback:** For products without dedicated GitHub docs repos (like the Choreo Labs Library)
 
 ## Architecture
 
-![System Architecture](https://raw.githubusercontent.com/iamvirul/wso2-docs-mcp-server/main/docs/architecture.svg)
+![System Architecture](https://raw.githubusercontent.com/iamvirul/choreo-docs-mcp-server/main/docs/architecture.svg)
 
 ## Documentation Sources
 
@@ -27,7 +29,7 @@ Under the hood, it uses a blazing-fast dual-ingestion engine:
 | Choreo | `choreo` | https://wso2.com/choreo/docs |
 | Identity Server | `is` | https://is.docs.wso2.com/en/latest |
 | Ballerina | `ballerina` | https://ballerina.io/learn |
-| WSO2 Library | `library` | https://wso2.com/library |
+| Choreo Labs Library | `library` | https://wso2.com/library |
 
 ## Prerequisites
 
@@ -51,20 +53,20 @@ Choose the setup path that fits your use case:
 
 ### Install from npm
 
-Install the package globally to get the `wso2-docs-mcp-server`, `wso2-docs-crawl`, and `wso2-docs-migrate` commands available system-wide:
+Install the package globally to get the `choreo-docs-mcp-server`, `choreo-docs-crawl`, and `choreo-docs-migrate` commands available system-wide:
 
 ```bash
-npm install -g wso2-docs-mcp-server
+npm install -g choreo-docs-mcp-server
 ```
 
-> **Prefer no global install?** You can use `npx wso2-docs-mcp-server`, `npx wso2-docs-crawl`, and `npx wso2-docs-migrate` in every step below - just replace the bare command with its `npx` equivalent.
+> **Prefer no global install?** You can use `npx choreo-docs-mcp-server`, `npx choreo-docs-crawl`, and `npx choreo-docs-migrate` in every step below - just replace the bare command with its `npx` equivalent.
 
 #### 1. Start pgvector
 
 Download the `docker-compose.yml` and start the database:
 
 ```bash
-curl -O https://raw.githubusercontent.com/iamvirul/wso2-docs-mcp-server/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/iamvirul/choreo-docs-mcp-server/main/docker-compose.yml
 docker compose up -d
 ```
 
@@ -82,26 +84,26 @@ ollama serve
 #### 3. Run database migration
 
 ```bash
-DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  wso2-docs-migrate
+DATABASE_URL="postgresql://choreomcp:choreomcp@localhost:5432/choreodocs" \
+  choreo-docs-migrate
 ```
 
 > Run migration again whenever you change `EMBEDDING_DIMENSIONS` (i.e. switch embedding provider). The script detects and handles dimension changes automatically.
 
-#### 4. Index WSO2 documentation
+#### 4. Index Choreo Labs documentation
 
 ```bash
 # Index all products (first run downloads the embedding model automatically)
-DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  wso2-docs-crawl
+DATABASE_URL="postgresql://choreomcp:choreomcp@localhost:5432/choreodocs" \
+  choreo-docs-crawl
 
 # Index a single product (faster, great for testing)
-DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  wso2-docs-crawl --product ballerina --limit 20
+DATABASE_URL="postgresql://choreomcp:choreomcp@localhost:5432/choreodocs" \
+  choreo-docs-crawl --product ballerina --limit 20
 
 # Force re-index even unchanged pages
-DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
-  wso2-docs-crawl --force
+DATABASE_URL="postgresql://choreomcp:choreomcp@localhost:5432/choreodocs" \
+  choreo-docs-crawl --force
 ```
 
 Available product IDs: `apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`
@@ -115,10 +117,10 @@ The MCP server is launched on demand by your AI client - no background process n
 ```json
 {
   "mcpServers": {
-    "wso2-docs": {
-      "command": "wso2-docs-mcp-server",
+    "choreo-docs": {
+      "command": "choreo-docs-mcp-server",
       "env": {
-        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "DATABASE_URL": "postgresql://choreomcp:choreomcp@localhost:5432/choreodocs",
         "EMBEDDING_PROVIDER": "ollama"
       }
     }
@@ -129,11 +131,11 @@ The MCP server is launched on demand by your AI client - no background process n
 **Claude Code** - run once in your terminal:
 
 ```bash
-claude mcp add wso2-docs \
+claude mcp add choreo-docs \
   --transport stdio \
-  -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  -e DATABASE_URL="postgresql://choreomcp:choreomcp@localhost:5432/choreodocs" \
   -e EMBEDDING_PROVIDER="ollama" \
-  -- wso2-docs-mcp-server
+  -- choreo-docs-mcp-server
 
 # Verify
 claude mcp list
@@ -144,10 +146,10 @@ claude mcp list
 ```json
 {
   "mcpServers": {
-    "wso2-docs": {
-      "command": "wso2-docs-mcp-server",
+    "choreo-docs": {
+      "command": "choreo-docs-mcp-server",
       "env": {
-        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "DATABASE_URL": "postgresql://choreomcp:choreomcp@localhost:5432/choreodocs",
         "EMBEDDING_PROVIDER": "ollama"
       }
     }
@@ -160,11 +162,11 @@ claude mcp list
 ```json
 {
   "servers": {
-    "wso2-docs": {
+    "choreo-docs": {
       "type": "stdio",
-      "command": "wso2-docs-mcp-server",
+      "command": "choreo-docs-mcp-server",
       "env": {
-        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "DATABASE_URL": "postgresql://choreomcp:choreomcp@localhost:5432/choreodocs",
         "EMBEDDING_PROVIDER": "ollama"
       }
     }
@@ -172,7 +174,7 @@ claude mcp list
 }
 ```
 
-> **Using `npx` instead of global install?** Replace `"command": "wso2-docs-mcp-server"` with `"command": "npx"` and add `"args": ["-y", "wso2-docs-mcp-server"]`.
+> **Using `npx` instead of global install?** Replace `"command": "choreo-docs-mcp-server"` with `"command": "npx"` and add `"args": ["-y", "choreo-docs-mcp-server"]`.
 
 > **Cloud embedding provider?** Add the key to `env`, e.g. `"EMBEDDING_PROVIDER": "openai", "OPENAI_API_KEY": "sk-..."`.
 
@@ -183,8 +185,8 @@ claude mcp list
 #### 1. Clone and install
 
 ```bash
-git clone https://github.com/iamvirul/wso2-docs-mcp-server.git
-cd wso2-docs-mcp-server
+git clone https://github.com/iamvirul/choreo-docs-mcp-server.git
+cd choreo-docs-mcp-server
 npm install
 ```
 
@@ -210,7 +212,7 @@ cp .env.example .env
 
 ```bash
 docker compose up -d
-# pgAdmin available at http://localhost:5050 (admin@wso2mcp.local / admin)
+# pgAdmin available at http://localhost:5050 (admin@choreomcp.local / admin)
 ```
 
 #### 5. Run database migration
@@ -249,18 +251,18 @@ npm run dev
 
 #### 8. Configure your AI client
 
-> Replace `/ABSOLUTE/PATH/TO/wso2-docs-mcp-server` with your actual clone path.
+> Replace `/ABSOLUTE/PATH/TO/choreo-docs-mcp-server` with your actual clone path.
 
 **Claude Desktop** - edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "wso2-docs": {
+    "choreo-docs": {
       "command": "node",
-      "args": ["/ABSOLUTE/PATH/TO/wso2-docs-mcp-server/dist/src/index.js"],
+      "args": ["/ABSOLUTE/PATH/TO/choreo-docs-mcp-server/dist/src/index.js"],
       "env": {
-        "DATABASE_URL": "postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs",
+        "DATABASE_URL": "postgresql://choreomcp:choreomcp@localhost:5432/choreodocs",
         "EMBEDDING_PROVIDER": "ollama"
       }
     }
@@ -271,11 +273,11 @@ npm run dev
 **Claude Code:**
 
 ```bash
-claude mcp add wso2-docs \
+claude mcp add choreo-docs \
   --transport stdio \
-  -e DATABASE_URL="postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs" \
+  -e DATABASE_URL="postgresql://choreomcp:choreomcp@localhost:5432/choreodocs" \
   -e EMBEDDING_PROVIDER="ollama" \
-  -- node "/ABSOLUTE/PATH/TO/wso2-docs-mcp-server/dist/src/index.js"
+  -- node "/ABSOLUTE/PATH/TO/choreo-docs-mcp-server/dist/src/index.js"
 
 # Verify
 claude mcp list
@@ -293,10 +295,10 @@ See `config-examples/claude_code.sh` for a convenience script.
 
 | Tool | Description |
 |---|---|
-| `search_wso2_docs` | Semantic search across all products. Optional `product` and `limit` filters. |
-| `get_wso2_guide` | Search within a specific product (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`). |
-| `explain_wso2_concept` | Broad concept search across all products, returns 8 top results. |
-| `list_wso2_products` | Returns all supported products with IDs and base URLs. |
+| `search_choreo_docs` | Semantic search across all products. Optional `product` and `limit` filters. |
+| `get_choreo_guide` | Search within a specific product (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`). |
+| `explain_choreo_concept` | Broad concept search across all products, returns 8 top results. |
+| `list_choreo_products` | Returns all supported products with IDs and base URLs. |
 
 ### Example response
 
@@ -314,6 +316,30 @@ See `config-examples/claude_code.sh` for a convenience script.
 ```
 
 ---
+
+## Migrating from wso2-docs-mcp-server
+
+WSO2 is now [Choreo Labs](https://choreolabs.com/). Version 2.0.0 renames this package to match. Upstream docs URLs, product names and product IDs (`apim`, `mi`, `bi`, `choreo`, `is`, `ballerina`, `library`) are **unchanged**.
+
+| What | Before (≤ 1.x) | After (≥ 2.0) |
+|------|----------------|---------------|
+| npm package | `wso2-docs-mcp-server` | `choreo-docs-mcp-server` |
+| CLI commands | `wso2-docs-mcp-server`, `wso2-docs-crawl`, `wso2-docs-migrate` | `choreo-docs-mcp-server`, `choreo-docs-crawl`, `choreo-docs-migrate` |
+| MCP tools | `search_wso2_docs`, `get_wso2_guide`, `explain_wso2_concept`, `list_wso2_products` | `search_choreo_docs`, `get_choreo_guide`, `explain_choreo_concept`, `list_choreo_products` |
+| MCP Registry name | `io.github.iamvirul/wso2-docs-mcp-server` | `io.github.iamvirul/choreo-docs-mcp-server` |
+| Default `MCP_SERVER_NAME` | `wso2-docs-mcp` | `choreo-docs-mcp` |
+| docker-compose DB user / db | `wso2mcp` / `wso2docs` | `choreomcp` / `choreodocs` |
+
+**Steps**
+
+1. Swap the package: `npm uninstall -g wso2-docs-mcp-server && npm install -g choreo-docs-mcp-server` (or change `npx -y wso2-docs-mcp-server` to `npx -y choreo-docs-mcp-server`).
+2. In your MCP client config, update `command`/`args` to the new binary names. You can also rename the server key (e.g. `"wso2-docs"` → `"choreo-docs"`).
+3. Update any prompts, agent instructions or tool allowlists that reference the old tool names.
+4. **Database** — pick one:
+   - **Keep your existing index (no re-crawl):** leave your current `DATABASE_URL` (`postgresql://wso2mcp:wso2mcp@localhost:5432/wso2docs`) as is. Postgres ignores the new `POSTGRES_*` values in `docker-compose.yml` because the existing volume is already initialised, so the old credentials keep working.
+   - **Start fresh with the new defaults:** `docker compose down -v`, download the new `docker-compose.yml`, `docker compose up -d`, then run `choreo-docs-migrate` and `choreo-docs-crawl` with `postgresql://choreomcp:choreomcp@localhost:5432/choreodocs`.
+
+The schema is unchanged, so you don't need a data migration.
 
 ## Local Embeddings
 
